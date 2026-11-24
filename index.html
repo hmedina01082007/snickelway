@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Snickelway</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Young+Serif&display=swap">
+<style>
+/* Layout: one narrow study column under an enamel station sign; the Minster's rose window is the progress meter. */
+:root {
+  --stone: #E6EAE8; --paper: #F8FAF8; --ink: #17223B; --soft: #55607A; --line: #CCD3D4;
+  --glass: #1D3F9A; --on-glass: #FFFFFF; --ruby: #AE1F3C; --amber: #B97400; --leaf: #1F7A58;
+  --tint: #DFE6F6; --ok: #DCF0E6; --bad: #F8DEE3; --unlit: #D3DADB;
+  --display: "Young Serif", Georgia, serif;
+  --ui: "Cabin", "Gill Sans", "Segoe UI", sans-serif;
+  --read: "Literata", Georgia, serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --stone: #0E1424; --paper: #182036; --ink: #E9ECF4; --soft: #A3ADC4; --line: #303A55;
+  --glass: #8FAAFF; --on-glass: #0E1424; --ruby: #FF8BA0; --amber: #F2B94C; --leaf: #63D0A6;
+  --tint: #232E50; --ok: #173B30; --bad: #47202C; --unlit: #28314C; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --stone: #0E1424; --paper: #182036; --ink: #E9ECF4; --soft: #A3ADC4; --line: #303A55;
+  --glass: #8FAAFF; --on-glass: #0E1424; --ruby: #FF8BA0; --amber: #F2B94C; --leaf: #63D0A6;
+  --tint: #232E50; --ok: #173B30; --bad: #47202C; --unlit: #28314C; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--stone); color: var(--ink); font: 400 16px/1.5 var(--ui); }
+#wrap { max-width: 720px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px 104px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.2; margin: 0; text-wrap: balance }
+h1 { font-size: 30px } h2 { font-size: 23px } h3 { font-size: 18px }
+p { margin: 0 }
+button, input, select, textarea { font: inherit; color: inherit }
+button { cursor: pointer }
+:focus-visible { outline: 2px solid var(--glass); outline-offset: 2px }
+.sign { display: inline-block; background: var(--glass); color: var(--on-glass); padding: 4px; border-radius: 7px; }
+.sign b { display: block; border: 1.5px solid var(--on-glass); border-radius: 4px; padding: 3px 12px; font: 700 15px/1.3 var(--ui); letter-spacing: .16em; text-transform: uppercase; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 20px }
+nav#tabs { display: flex; gap: 4px }
+nav#tabs button { border: 0; background: none; padding: 7px 12px; border-radius: 6px; font-weight: 600; color: var(--soft) }
+nav#tabs button[aria-current="page"] { background: var(--tint); color: var(--ink) }
+@media (max-width: 640px) {
+  nav#tabs { position: fixed; z-index: 5; left: 0; right: 0; bottom: 0; background: var(--paper); border-top: 1px solid var(--line); justify-content: space-around;
+    padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
+  nav#tabs button { flex: 1; padding: 9px 2px }
+}
+.stack { display: grid; gap: 16px } .stack > * { min-width: 0 }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center }
+.between { justify-content: space-between }
+.grow { flex: 1 1 180px; min-width: 0 }
+.muted { color: var(--soft) } .small { font-size: 14px }
+.eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--soft) }
+.panel { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 10px }
+.panel > * { min-width: 0 }
+.btn { border: 1px solid var(--line); background: var(--paper); border-radius: 7px; padding: 9px 14px; font-weight: 600 }
+.btn:hover { border-color: var(--glass) }
+.btn.main { background: var(--glass); border-color: var(--glass); color: var(--on-glass) }
+.btn.bad { color: var(--ruby) }
+.btn:disabled { opacity: .55; cursor: default }
+.link { border: 0; background: none; padding: 4px 0; color: var(--glass); font-weight: 600 }
+input.f, select.f, textarea.f { width: 100%; background: var(--paper); border: 1px solid var(--line); border-radius: 7px; padding: 9px 11px }
+label.l { display: grid; gap: 3px; font-size: 14px; font-weight: 600; color: var(--soft); min-width: 0 }
+label.l .f { color: var(--ink); font-weight: 400; font-size: 16px }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px } .two > * { min-width: 0 }
+.noai .ai { display: none !important }
+
+/* hero */
+.hero { display: grid; grid-template-columns: 200px 1fr; gap: 20px; align-items: center }
+.hero > * { min-width: 0 }
+.rose { width: 100%; max-width: 200px; height: auto; display: block; margin: 0 auto }
+.stats { display: flex; gap: 22px; flex-wrap: wrap }
+.stats div b { display: block; font: 400 28px/1.1 var(--display); font-variant-numeric: tabular-nums }
+.stats div span { font-size: 13px; color: var(--soft) }
+@media (max-width: 520px) { .hero { grid-template-columns: 1fr } }
+
+/* lists */
+.list { display: grid; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; overflow: hidden }
+.item { display: flex; gap: 12px; align-items: center; justify-content: space-between; width: 100%; text-align: left; background: none; border: 0; border-top: 1px solid var(--line); padding: 11px 14px }
+.item:first-child { border-top: 0 }
+.item:hover { background: var(--tint) }
+.item > span { min-width: 0 }
+.ipa { font-family: "Segoe UI", "Noto Sans", "Lucida Sans Unicode", sans-serif; color: var(--glass) }
+.term { font-weight: 600 } .pips { display: inline-flex; gap: 3px; flex: none }
+.pips i { width: 7px; height: 7px; border-radius: 2px; background: var(--unlit); transform: rotate(45deg) }
+.pips i.on { background: var(--amber) }
+.chips { display: flex; gap: 6px; flex-wrap: wrap }
+.chip { border: 1px solid var(--line); background: var(--paper); border-radius: 99px; padding: 4px 11px; font-size: 14px; font-weight: 500 }
+.chip[aria-pressed="true"] { background: var(--tint); border-color: var(--glass) }
+.tag { font-size: 13px; color: var(--soft) }
+.tag.syn b { color: var(--leaf) } .tag.ant b { color: var(--ruby) }
+
+/* reading */
+.article { font: 400 18px/1.68 var(--read); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 22px clamp(16px, 5vw, 34px); display: grid; gap: 16px }
+.article p { max-width: 65ch; overflow-wrap: anywhere }
+.w { cursor: pointer; border-radius: 3px } .w:hover { background: var(--tint) }
+.w.saved { border-bottom: 2px dotted var(--amber) }
+select.gap, input.gap { font: 500 15px var(--ui); background: var(--tint); border: 1px solid var(--glass); border-radius: 5px; padding: 1px 5px; max-width: 170px; }
+input.gap { width: 10ch } select.gap { color: var(--ink) }
+.gap.ok { background: var(--ok); border-color: var(--leaf) } .gap.no { background: var(--bad); border-color: var(--ruby) }
+.num { font: 700 12px var(--ui); color: var(--soft); margin-right: 2px }
+.base { font: 700 13px var(--ui); letter-spacing: .04em; color: var(--ruby); margin-left: 3px }
+.fix { font: 600 15px var(--ui); color: var(--leaf); margin-left: 3px }
+.q { display: grid; gap: 6px }
+.opt { display: flex; gap: 8px; align-items: flex-start; padding: 7px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper) }
+.opt.ok { background: var(--ok); border-color: var(--leaf) } .opt.no { background: var(--bad); border-color: var(--ruby) }
+.notes { display: grid; gap: 7px; padding: 0; margin: 0; list-style: none; font-size: 15px }
+
+/* cards */
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 28px 20px; text-align: center; display: grid; gap: 12px; min-height: 260px; align-content: center }
+.card .big { font: 400 clamp(28px, 7vw, 40px)/1.15 var(--display); overflow-wrap: anywhere }
+.bar { height: 6px; background: var(--unlit); border-radius: 3px; overflow: hidden } .bar i { display: block; height: 100%; background: var(--glass) }
+
+/* games */
+.game { display: grid; grid-template-columns: 44px 1fr; gap: 12px; text-align: left; align-items: center; width: 100%; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 14px }
+.game:hover { border-color: var(--glass) } .game > * { min-width: 0 }
+.game svg { width: 44px; height: 44px }
+.choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px }
+.choices button { padding: 13px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); font-weight: 600; overflow-wrap: anywhere }
+.choices button:hover:not(:disabled) { border-color: var(--glass) }
+.choices button.ok, .pair.ok { background: var(--ok); border-color: var(--leaf) } .choices button.no, .pair.no { background: var(--bad); border-color: var(--ruby) }
+.pairs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px } .pairs > div { display: grid; gap: 8px; min-width: 0; align-content: start }
+.pair { padding: 11px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); font-weight: 500; overflow-wrap: anywhere; min-height: 52px }
+.pair.sel { border-color: var(--glass); background: var(--tint) } .pair:disabled { opacity: .6 }
+.tiles { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center }
+.tile { width: 40px; height: 44px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); font: 400 20px var(--display); text-transform: lowercase }
+.tile:disabled { opacity: .25 }
+.slot { min-height: 44px; font: 400 26px var(--display); letter-spacing: .08em; text-align: center; overflow-wrap: anywhere }
+@keyframes shake { 25% { transform: translateX(-5px) } 75% { transform: translateX(5px) } }
+.shake { animation: shake .2s 2 }
+@media (prefers-reduced-motion: reduce) { .shake { animation: none } }
+
+/* sheet + toast */
+#sheet { position: fixed; inset: 0; z-index: 20; background: rgba(10, 15, 30, .45); display: flex; align-items: flex-end; justify-content: center }
+#sheet > div { background: var(--paper); width: 100%; max-width: 600px; max-height: 88%; overflow-y: auto; border-radius: 14px 14px 0 0; display: grid; gap: 12px;
+  padding: 18px max(16px, env(safe-area-inset-right, 0px)) calc(18px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+#sheet > div > * { min-width: 0 }
+#toast { position: fixed; z-index: 30; left: 50%; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--stone); padding: 8px 14px; border-radius: 7px; font-weight: 500; max-width: 90%; }
+</style>
+</head>
+<body>
+
+<div id="wrap">
+  <header>
+    <span class="sign"><b>Snickelway</b></span>
+    <nav id="tabs" aria-label="Secciones">
+      <button data-a="tab" data-v="today">Hoy</button>
+      <button data-a="tab" data-v="words">Vocabulario</button>
+      <button data-a="tab" data-v="reading">Lecturas</button>
+      <button data-a="tab" data-v="games">Juegos</button>
+    </nav>
+  </header>
+  <main id="main"><p class="muted">Cargando tu vocabulario…</p></main>
+</div>
+<div id="sheet" hidden></div>
+<div id="toast" role="status" hidden></div>
+
+<script id="seed" type="application/json">{"words":[{"id":"e-a-blessing-in-disguise","added":1,"antonyms":[],"box":0,"due":0,"es":"una bendición disfrazada","example":"Failing that interview was a blessing in disguise.","kind":"expression","meaning":"something bad that turns out to be good","note":"Al mirar atrás a algo malo que acabó bien.","pos":"expression","synonyms":[],"term":"a blessing in disguise","topic":"General"},{"id":"e-a-steep-learning-curve","added":1,"antonyms":[],"box":0,"due":0,"es":"una curva de aprendizaje empinada","example":"Rust has a steep learning curve for most beginners.","kind":"expression","meaning":"something hard to learn quickly","note":"Muy usada en trabajo y estudios, casi siempre con \"have\" o \"face\".","pos":"expression","synonyms":[],"term":"a steep learning curve","topic":"Software"},{"id":"e-a-walk-in-the-park","added":1,"antonyms":[],"box":0,"due":0,"es":"pan comido","example":"The first assignment was a walk in the park.","kind":"expression","meaning":"something very easy","note":"Informal. Suele ir con \"was\" o \"wasn't\".","pos":"expression","synonyms":["a piece of cake"],"term":"a walk in the park","topic":"University"},{"id":"e-back-to-square-one","added":1,"antonyms":[],"box":0,"due":0,"es":"volver a empezar de cero","example":"The merge failed, so we are back to square one.","kind":"expression","meaning":"returning to the start after failing","note":"Cuando un plan falla y toca empezar de nuevo.","pos":"expression","synonyms":["back to the drawing board"],"term":"back to square one","topic":"Software"},{"id":"e-bear-in-mind","added":1,"antonyms":[],"box":0,"due":0,"es":"tener en cuenta","example":"Bear in mind that the library closes early on Sundays.","kind":"expression","meaning":"to remember something important when deciding","note":"Neutra. Muy frecuente en avisos e instrucciones.","pos":"expression","synonyms":["keep in mind"],"term":"bear in mind","topic":"University"},{"id":"e-bite-off-more-than-you-can-chew","added":1,"antonyms":[],"box":0,"due":0,"es":"abarcar más de lo que puedes","example":"I bit off more than I could chew by taking five modules.","kind":"expression","meaning":"to try to do more than you are able to","note":"Informal. Al hablar de haber aceptado demasiado trabajo.","pos":"expression","synonyms":[],"term":"bite off more than you can chew","topic":"University"},{"id":"e-cheers","added":1,"antonyms":[],"box":1,"due":1794041617816,"es":"gracias / salud","example":"\"Here's your change.\" \"Cheers!\"","kind":"expression","meaning":"(UK, informal) thank you; also said before drinking","note":"Oirás esto a todas horas en lugar de \"thank you\". También al brindar.","pos":"expression","synonyms":["ta"],"term":"cheers","topic":"British life"},{"id":"e-cut-corners","added":1,"antonyms":[],"box":0,"due":0,"es":"hacer algo de forma chapucera para ahorrar","example":"If you cut corners on testing, you will pay for it later.","kind":"expression","meaning":"to do something badly or cheaply to save time or money","note":"Crítica habitual en el trabajo. Registro neutro.","pos":"expression","synonyms":[],"term":"cut corners","topic":"Software"},{"id":"e-fair-enough","added":1,"antonyms":[],"box":0,"due":0,"es":"vale, me parece bien","example":"\"I can't come tonight, I've got a deadline.\" \"Fair enough.\"","kind":"expression","meaning":"used to accept that something is reasonable","note":"Muy británica. Aceptas lo que te dicen aunque no te entusiasme.","pos":"expression","synonyms":[],"term":"fair enough","topic":"British life"},{"id":"e-fancy-a-pint","added":1,"antonyms":[],"box":0,"due":0,"es":"¿te apetece una cerveza?","example":"Fancy a pint after the seminar?","kind":"expression","meaning":"(UK, informal) would you like to go for a beer?","note":"Informal. \"Fancy\" = apetecer. Sirve con todo: \"fancy a coffee?\".","pos":"expression","synonyms":["fancy a drink"],"term":"fancy a pint","topic":"British life"},{"id":"e-get-the-hang-of","added":1,"antonyms":[],"box":0,"due":0,"es":"pillarle el truco a","example":"You will get the hang of the British bus system eventually.","kind":"expression","meaning":"to learn how to do something","note":"Informal. Siempre seguida de algo: \"get the hang of it\".","pos":"expression","synonyms":[],"term":"get the hang of","topic":"British life"},{"id":"e-go-the-extra-mile","added":1,"antonyms":[],"box":0,"due":0,"es":"esforzarse más de lo esperado","example":"Our tutor always goes the extra mile before exams.","kind":"expression","meaning":"to make more effort than is expected","note":"Para elogiar a alguien. Muy común en entrevistas y en el trabajo.","pos":"expression","synonyms":[],"term":"go the extra mile","topic":"University"},{"id":"e-hit-the-books","added":1,"antonyms":[],"box":0,"due":0,"es":"ponerse a estudiar en serio","example":"Exams start on Monday, so it's time to hit the books.","kind":"expression","meaning":"to start studying hard","note":"Informal y algo americana. En UK dirás también \"get some revision done\".","pos":"expression","synonyms":[],"term":"hit the books","topic":"University"},{"id":"e-i-m-not-sure-i-agree","added":1,"antonyms":[],"box":0,"due":0,"es":"una forma educada de discrepar","example":"I'm not sure I agree, but tell me more about your reasoning.","kind":"expression","meaning":"a polite way to disagree","note":"Forma suave de decir que no estás de acuerdo. Ideal en seminarios.","pos":"expression","synonyms":[],"term":"I'm not sure I agree","topic":"University"},{"id":"e-it-could-be-argued-that","added":1,"antonyms":[],"box":0,"due":0,"es":"se podría argumentar que","example":"It could be argued that the study sample was too small.","kind":"expression","meaning":"an academic phrase to introduce a claim carefully","note":"Académica: se usa en ensayos y seminarios.","pos":"expression","synonyms":[],"term":"it could be argued that","topic":"University"},{"id":"e-mw4qncqxmtvn","added":1793955269193,"antonyms":[],"box":0,"due":0,"es":"dar en el clavo","example":"You hit the nail on the head with that comment.","ipa":"","kind":"expression","meaning":"to say exactly the right thing","note":"Halago habitual en una conversación.","pos":"expression","synonyms":[],"term":"hit the nail on the head","topic":"General"},{"id":"e-on-the-same-page","added":1,"antonyms":[],"box":0,"due":0,"es":"estar en la misma onda","example":"Let's have a quick call so that we are all on the same page.","kind":"expression","meaning":"in agreement or sharing the same understanding","note":"Típica de reuniones de trabajo.","pos":"expression","synonyms":[],"term":"on the same page","topic":"Software"},{"id":"e-play-it-by-ear","added":1,"antonyms":[],"box":0,"due":0,"es":"improvisar sobre la marcha","example":"We don't have a plan for the weekend, so we'll play it by ear.","kind":"expression","meaning":"to decide what to do as things happen","note":"Informal. Para planes sin concretar.","pos":"expression","synonyms":[],"term":"play it by ear","topic":"British life"},{"id":"e-pull-an-all-nighter","added":1,"antonyms":[],"box":0,"due":0,"es":"pasar la noche en vela estudiando","example":"I pulled an all-nighter to finish the report.","kind":"expression","meaning":"to stay awake all night to work or study","note":"Muy común entre estudiantes.","pos":"expression","synonyms":[],"term":"pull an all-nighter","topic":"University"},{"id":"e-sort-something-out","added":1,"antonyms":[],"box":0,"due":0,"es":"arreglar, solucionar","example":"I need to sort out my student visa this week.","kind":"expression","meaning":"(UK) to solve or arrange something","note":"Británica y constante en el día a día: \"I'll sort it out\".","pos":"expression","synonyms":[],"term":"sort something out","topic":"British life"},{"id":"e-take-something-with-a-pinch-of-salt","added":1,"antonyms":[],"box":0,"due":0,"es":"tomar algo con reservas","example":"Take online reviews with a pinch of salt.","kind":"expression","meaning":"to not fully believe something","note":"\"Something\" se sustituye: \"take it with a pinch of salt\".","pos":"expression","synonyms":[],"term":"take something with a pinch of salt","topic":"General"},{"id":"e-ten-a-penny","added":1,"antonyms":[],"box":1,"due":1793955110798,"es":"a patadas","example":"To-do list apps are ten a penny.","kind":"expression","meaning":"(UK) very common and of little value","note":"Británica e informal. Para algo que abunda y no tiene valor.","pos":"expression","synonyms":[],"term":"ten a penny","topic":"Software"},{"id":"e-the-elephant-in-the-room","added":1,"antonyms":[],"box":1,"due":1793955094413,"es":"el tema incómodo que nadie menciona","example":"The missing budget was the elephant in the room.","kind":"expression","meaning":"an obvious problem that nobody wants to discuss","note":"Para señalar un tema incómodo del que nadie habla.","pos":"expression","synonyms":[],"term":"the elephant in the room","topic":"General"},{"id":"e-touch-base","added":1,"antonyms":[],"box":0,"due":0,"es":"ponerse en contacto brevemente","example":"Let's touch base after the sprint review.","kind":"expression","meaning":"to make brief contact with someone","note":"Lenguaje de oficina. Algo cliché, pero la oirás.","pos":"expression","synonyms":[],"term":"touch base","topic":"Software"},{"id":"e-under-the-weather","added":1,"antonyms":[],"box":1,"due":1793955192799,"es":"pachucho","example":"I'm feeling a bit under the weather, so I'll miss the lecture.","kind":"expression","meaning":"slightly ill","note":"Suave y educada: no se usa para enfermedades graves.","pos":"expression","synonyms":[],"term":"under the weather","topic":"British life"},{"id":"w-albeit","added":1,"antonyms":[],"box":1,"due":1793955149815,"es":"aunque, si bien","example":"The project succeeded, albeit more slowly than planned.","ipa":"/ɔːlˈbiːɪt/","kind":"word","meaning":"although; even if","pos":"conj","synonyms":["although","though","even if"],"term":"albeit","topic":"General"},{"id":"w-ambiguous","added":1,"antonyms":["clear","explicit"],"box":0,"due":0,"es":"ambiguo","example":"The requirements were so ambiguous that two teams built different features.","ipa":"/æmˈbɪɡjuəs/","kind":"word","meaning":"having more than one possible meaning","pos":"adj","synonyms":["unclear","vague","equivocal"],"term":"ambiguous","topic":"Software"},{"id":"w-bolster","added":1,"antonyms":["weaken","undermine"],"box":1,"due":1793955239133,"es":"reforzar","example":"A year abroad will bolster your CV.","ipa":"/ˈbəʊlstə/","kind":"word","meaning":"to support or strengthen something","pos":"verb","synonyms":["reinforce","strengthen","boost"],"term":"bolster","topic":"General"},{"id":"w-bottleneck","added":1,"antonyms":[],"box":1,"due":1794041522832,"es":"cuello de botella","example":"The database turned out to be the real bottleneck.","ipa":"/ˈbɒtlnek/","kind":"word","meaning":"a part of a process that slows everything down","pos":"noun","synonyms":["chokepoint","constraint"],"term":"bottleneck","topic":"Software"},{"id":"w-brilliant","added":1,"antonyms":["awful","dreadful"],"box":1,"due":1794041515221,"es":"genial","example":"\"I'll send you the notes.\" \"Brilliant, cheers!\"","ipa":"/ˈbrɪliənt/","kind":"word","meaning":"(informal, UK) excellent; also a common way to say thanks","pos":"adj","synonyms":["fantastic","superb","great"],"term":"brilliant","topic":"British life"},{"id":"w-candid","added":1,"antonyms":["evasive","guarded"],"box":1,"due":1794041572118,"es":"franco, sincero","example":"My tutor gave me candid feedback on the draft.","ipa":"/ˈkændɪd/","kind":"word","meaning":"honest and direct, even if unpleasant","pos":"adj","synonyms":["frank","open","forthright"],"term":"candid","topic":"University"},{"id":"w-coherent","added":1,"antonyms":["incoherent","disjointed"],"box":0,"due":0,"es":"coherente","example":"Your essay needs a more coherent argument.","ipa":"/kəʊˈhɪərənt/","kind":"word","meaning":"logical and well organised","pos":"adj","synonyms":["logical","consistent","lucid"],"term":"coherent","topic":"University"},{"id":"w-concise","added":1,"antonyms":["verbose","rambling"],"box":0,"due":0,"es":"conciso","example":"Keep your commit messages concise.","ipa":"/kənˈsaɪs/","kind":"word","meaning":"giving information clearly in few words","pos":"adj","synonyms":["succinct","brief","terse"],"term":"concise","topic":"Software"},{"id":"w-cumbersome","added":1,"antonyms":["convenient","handy"],"box":0,"due":0,"es":"engorroso","example":"The old deployment process was so cumbersome that nobody dared to run it on Fridays.","ipa":"/ˈkʌmbəsəm/","kind":"word","meaning":"slow and difficult to use because of its size or complexity","pos":"adj","synonyms":["unwieldy","awkward","clunky"],"term":"cumbersome","topic":"Software"},{"id":"w-daunting","added":1,"antonyms":["encouraging","reassuring"],"box":0,"due":0,"es":"intimidante","example":"Moving to a new country can seem daunting at first.","ipa":"/ˈdɔːntɪŋ/","kind":"word","meaning":"making you feel slightly afraid or less confident","pos":"adj","synonyms":["intimidating","formidable","overwhelming"],"term":"daunting","topic":"University"},{"id":"w-deadline","added":1,"antonyms":[],"box":0,"due":0,"es":"fecha límite","example":"The coursework deadline is at noon on Friday.","ipa":"/ˈdedlaɪn/","kind":"word","meaning":"the latest time by which something must be finished","pos":"noun","synonyms":["due date","cut-off"],"term":"deadline","topic":"University"},{"id":"w-deter","added":1,"antonyms":["encourage","persuade"],"box":0,"due":0,"es":"disuadir","example":"High rents deter many students from living in the centre.","ipa":"/dɪˈtɜː/","kind":"word","meaning":"to discourage someone from doing something","pos":"verb","synonyms":["discourage","dissuade","put off"],"term":"deter","topic":"General"},{"id":"w-diligent","added":1,"antonyms":["lazy","negligent"],"box":0,"due":0,"es":"diligente","example":"A diligent student reviews their notes every week.","ipa":"/ˈdɪlɪdʒənt/","kind":"word","meaning":"working carefully and with steady effort","pos":"adj","synonyms":["hard-working","conscientious","industrious"],"term":"diligent","topic":"University"},{"id":"w-drawback","added":1,"antonyms":["advantage","benefit"],"box":0,"due":0,"es":"inconveniente","example":"The main drawback of this framework is its slow start-up time.","ipa":"/ˈdrɔːbæk/","kind":"word","meaning":"a disadvantage or problem","pos":"noun","synonyms":["disadvantage","downside","shortcoming"],"term":"drawback","topic":"Software"},{"id":"w-endeavour","added":1,"antonyms":[],"box":0,"due":0,"es":"empeño, esfuerzo","example":"Studying abroad is an expensive endeavour.","ipa":"/ɪnˈdevə/","kind":"word","meaning":"a serious attempt to do something difficult","pos":"noun","synonyms":["effort","undertaking","venture"],"term":"endeavour","topic":"General"},{"id":"w-exacerbate","added":1,"antonyms":["alleviate","ease"],"box":0,"due":0,"es":"agravar","example":"Skipping meals will only exacerbate your exam stress.","ipa":"/ɪɡˈzæsəbeɪt/","kind":"word","meaning":"to make a bad situation worse","pos":"verb","synonyms":["aggravate","worsen","intensify"],"term":"exacerbate","topic":"General"},{"id":"w-feasible","added":1,"antonyms":["impossible","unworkable"],"box":1,"due":1793955247175,"es":"viable","example":"Is it feasible to finish the coursework by Monday?","ipa":"/ˈfiːzəbl/","kind":"word","meaning":"possible and practical to do","pos":"adj","synonyms":["viable","achievable","practicable"],"term":"feasible","topic":"University"},{"id":"w-foster","added":1,"antonyms":["hinder","suppress"],"box":1,"due":1793955252490,"es":"fomentar","example":"Pair programming fosters good habits among junior developers.","ipa":"/ˈfɒstə/","kind":"word","meaning":"to encourage the development of something","pos":"verb","synonyms":["nurture","promote","cultivate"],"term":"foster","topic":"Software"},{"id":"w-hinder","added":1,"antonyms":["help","facilitate"],"box":0,"due":0,"es":"obstaculizar","example":"Poor documentation hindered the project.","ipa":"/ˈhɪndə/","kind":"word","meaning":"to make progress difficult","pos":"verb","synonyms":["hamper","impede","obstruct"],"term":"hinder","topic":"Software"},{"id":"w-keen","added":1,"antonyms":["reluctant","indifferent"],"box":1,"due":1794041541301,"es":"entusiasta, con ganas","example":"I am keen to join the computing society.","ipa":"/kiːn/","kind":"word","meaning":"very interested or eager","pos":"adj","synonyms":["eager","enthusiastic","avid"],"term":"keen","topic":"British life"},{"id":"w-knackered","added":1,"antonyms":["refreshed","energetic"],"box":1,"due":1793955227433,"es":"hecho polvo","example":"I was knackered after the night train from London.","ipa":"/ˈnækəd/","kind":"word","meaning":"(informal, UK) extremely tired","pos":"adj","synonyms":["exhausted","shattered","worn out"],"term":"knackered","topic":"British life"},{"id":"w-landlord","added":1,"antonyms":["tenant"],"box":1,"due":1793955075236,"es":"casero","example":"Ask your landlord to fix the boiler before winter.","ipa":"/ˈlændlɔːd/","kind":"word","meaning":"a person who rents out a property","pos":"noun","synonyms":["property owner"],"term":"landlord","topic":"British life"},{"id":"w-leverage","added":1,"antonyms":[],"box":1,"due":1793955182799,"es":"aprovechar","example":"The team leveraged open-source tools to cut costs.","ipa":"/ˈliːvərɪdʒ/","kind":"word","meaning":"to use something to maximum advantage","pos":"verb","synonyms":["exploit","utilise","harness"],"term":"leverage","topic":"Software"},{"id":"w-meticulous","added":1,"antonyms":["careless","sloppy"],"box":1,"due":1794041529132,"es":"meticuloso","example":"His meticulous notes saved the whole group before the exam.","ipa":"/məˈtɪkjələs/","kind":"word","meaning":"showing great care and attention to detail","pos":"adj","synonyms":["thorough","painstaking","scrupulous"],"term":"meticulous","topic":"General"},{"id":"w-mitigate","added":1,"antonyms":["aggravate","worsen"],"box":1,"due":1794041605386,"es":"mitigar","example":"Automated tests help to mitigate the risk of regressions.","ipa":"/ˈmɪtɪɡeɪt/","kind":"word","meaning":"to make something less harmful or severe","pos":"verb","synonyms":["alleviate","lessen","reduce"],"term":"mitigate","topic":"Software"},{"id":"w-mw4qntscs1mv","added":1793955291276,"antonyms":[],"box":0,"due":0,"es":"rendimiento","example":"Caching doubled the throughput of the API.","ipa":"/ˈθruːpʊt/","kind":"word","meaning":"the amount of work a system handles in a given time","pos":"noun","synonyms":["capacity","output"],"term":"throughput","topic":"Informática"},{"id":"w-nonetheless","added":1,"antonyms":[],"box":0,"due":0,"es":"no obstante","example":"It was raining heavily; nonetheless, the tour continued.","ipa":"/ˌnʌnðəˈles/","kind":"word","meaning":"in spite of what has just been said","pos":"adverb","synonyms":["nevertheless","even so","however"],"term":"nonetheless","topic":"General"},{"id":"w-notwithstanding","added":1,"antonyms":["because of"],"box":0,"due":0,"es":"a pesar de","example":"Notwithstanding the delays, the team shipped on time.","ipa":"/ˌnɒtwɪθˈstændɪŋ/","kind":"word","meaning":"in spite of","pos":"prep","synonyms":["despite","regardless of","in spite of"],"term":"notwithstanding","topic":"General"},{"id":"w-obsolete","added":1,"antonyms":["current","modern"],"box":0,"due":0,"es":"obsoleto","example":"This library became obsolete when the framework was rewritten.","ipa":"/ˈɒbsəliːt/","kind":"word","meaning":"no longer used because something better exists","pos":"adj","synonyms":["outdated","antiquated","defunct"],"term":"obsolete","topic":"Software"},{"id":"w-plagiarism","added":1,"antonyms":[],"box":0,"due":0,"es":"plagio","example":"Plagiarism can lead to a failed module.","ipa":"/ˈpleɪdʒərɪzəm/","kind":"word","meaning":"presenting someone else's work as your own","pos":"noun","synonyms":["copying"],"term":"plagiarism","topic":"University"},{"id":"w-plausible","added":1,"antonyms":["implausible","unlikely"],"box":0,"due":0,"es":"verosímil","example":"The assistant gave a plausible but wrong answer.","ipa":"/ˈplɔːzəbl/","kind":"word","meaning":"seeming reasonable or likely to be true","pos":"adj","synonyms":["credible","believable","likely"],"term":"plausible","topic":"Software"},{"id":"w-prevalent","added":1,"antonyms":["rare","uncommon"],"box":0,"due":0,"es":"predominante","example":"Remote work is now prevalent in the tech industry.","ipa":"/ˈprevələnt/","kind":"word","meaning":"common at a particular time or place","pos":"adj","synonyms":["widespread","common","rife"],"term":"prevalent","topic":"General"},{"id":"w-profound","added":1,"antonyms":["superficial","shallow"],"box":0,"due":0,"es":"profundo","example":"Living abroad had a profound effect on her outlook.","ipa":"/prəˈfaʊnd/","kind":"word","meaning":"very great or deep in meaning","pos":"adj","synonyms":["deep","intense","far-reaching"],"term":"profound","topic":"General"},{"id":"w-refactor","added":1,"antonyms":[],"box":0,"due":0,"es":"refactorizar","example":"Refactor that function before you add new features.","ipa":"/ˌriːˈfæktə/","kind":"word","meaning":"to restructure code without changing what it does","pos":"verb","synonyms":["restructure","rework"],"term":"refactor","topic":"Software"},{"id":"w-reluctant","added":1,"antonyms":["eager","keen"],"box":1,"due":1793955082980,"es":"reacio","example":"He was reluctant to speak in the first seminar.","ipa":"/rɪˈlʌktənt/","kind":"word","meaning":"unwilling to do something","pos":"adj","synonyms":["unwilling","hesitant","disinclined"],"term":"reluctant","topic":"University"},{"id":"w-resilient","added":1,"antonyms":["fragile","vulnerable"],"box":0,"due":0,"es":"resiliente","example":"International students tend to be surprisingly resilient.","ipa":"/rɪˈzɪliənt/","kind":"word","meaning":"able to recover quickly from difficulties","pos":"adj","synonyms":["tough","adaptable","hardy"],"term":"resilient","topic":"General"},{"id":"w-robust","added":1,"antonyms":["fragile","flimsy"],"box":0,"due":0,"es":"robusto, sólido","example":"We need a robust login system before launch.","ipa":"/rəʊˈbʌst/","kind":"word","meaning":"strong and unlikely to fail","pos":"adj","synonyms":["sturdy","resilient","solid"],"term":"robust","topic":"Software"},{"id":"w-rubbish","added":1,"antonyms":[],"box":0,"due":0,"es":"basura","example":"Put the rubbish out on Thursday night.","ipa":"/ˈrʌbɪʃ/","kind":"word","meaning":"(UK) waste; also, something of poor quality","pos":"noun","synonyms":["waste","garbage","nonsense"],"term":"rubbish","topic":"British life"},{"id":"w-scalable","added":1,"antonyms":[],"box":0,"due":0,"es":"escalable","example":"A scalable architecture is pointless if nobody uses the app.","ipa":"/ˈskeɪləbl/","kind":"word","meaning":"able to handle growing amounts of work","pos":"adj","synonyms":["expandable","extensible"],"term":"scalable","topic":"Software"},{"id":"w-scrutinise","added":1,"antonyms":["overlook","skim"],"box":1,"due":1793955201319,"es":"escudriñar","example":"Reviewers will scrutinise every line of your pull request.","ipa":"/ˈskruːtənaɪz/","kind":"word","meaning":"to examine something very carefully","pos":"verb","synonyms":["inspect","examine","analyse"],"term":"scrutinise","topic":"Software"},{"id":"w-stringent","added":1,"antonyms":["lenient","lax"],"box":0,"due":0,"es":"riguroso","example":"The university has stringent rules on plagiarism.","ipa":"/ˈstrɪndʒənt/","kind":"word","meaning":"very strict and demanding","pos":"adj","synonyms":["strict","rigorous","tight"],"term":"stringent","topic":"University"},{"id":"w-superficial","added":1,"antonyms":["profound","thorough"],"box":0,"due":0,"es":"superficial","example":"A superficial reading will not get you through the seminar.","ipa":"/ˌsuːpəˈfɪʃl/","kind":"word","meaning":"not deep or thorough; on the surface only","pos":"adj","synonyms":["shallow","cursory","surface-level"],"term":"superficial","topic":"University"},{"id":"w-tentative","added":1,"antonyms":["definite","confident"],"box":0,"due":0,"es":"provisional, vacilante","example":"She offered a tentative answer during the seminar.","ipa":"/ˈtentətɪv/","kind":"word","meaning":"not certain or confident; provisional","pos":"adj","synonyms":["hesitant","provisional","cautious"],"term":"tentative","topic":"University"},{"id":"w-thrive","added":1,"antonyms":["struggle","languish"],"box":0,"due":0,"es":"prosperar","example":"Some students thrive under pressure.","ipa":"/θraɪv/","kind":"word","meaning":"to grow or develop successfully","pos":"verb","synonyms":["flourish","prosper","blossom"],"term":"thrive","topic":"General"},{"id":"w-ubiquitous","added":1,"antonyms":["rare","scarce"],"box":0,"due":0,"es":"omnipresente","example":"Smartphones have become ubiquitous in lecture theatres.","ipa":"/juːˈbɪkwɪtəs/","kind":"word","meaning":"found everywhere","pos":"adj","synonyms":["pervasive","omnipresent","widespread"],"term":"ubiquitous","topic":"General"},{"id":"w-undermine","added":1,"antonyms":["strengthen","reinforce"],"box":1,"due":1793955163699,"es":"socavar","example":"Constant interruptions undermine your concentration.","ipa":"/ˌʌndəˈmaɪn/","kind":"word","meaning":"to gradually weaken something","pos":"verb","synonyms":["weaken","erode","sabotage"],"term":"undermine","topic":"General"}],"pool":[{"id":"p-a-bit-of-a-nightmare","antonyms":[],"cat":"england","es":"un poco pesadilla","example":"Getting a GP appointment was a bit of a nightmare.","ipa":"","kind":"expression","meaning":"quite a difficult situation","note":"Con \"a bit of\" se suaviza todo en UK.","played":0,"pos":"expression","synonyms":[],"term":"a bit of a nightmare"},{"id":"p-a-game-of-two-halves","antonyms":[],"cat":"sport","es":"un partido que da un vuelco","example":"The exam was a game of two halves.","ipa":"","kind":"expression","meaning":"a match or situation that changes completely","note":"Cliché típico de comentaristas británicos.","played":0,"pos":"expression","synonyms":[],"term":"a game of two halves"},{"id":"p-a-hat-trick","antonyms":[],"cat":"sport","es":"un triplete","example":"He scored a hat-trick in the second half.","ipa":"","kind":"expression","meaning":"three goals by one player in a match","note":"Se usa también para tres éxitos seguidos.","played":0,"pos":"expression","synonyms":[],"term":"a hat-trick"},{"id":"p-a-level-playing-field","antonyms":[],"cat":"sport","es":"igualdad de condiciones","example":"The new rules create a level playing field for small clubs.","ipa":"","kind":"expression","meaning":"a situation that is fair for everyone","note":"Registro neutro, común en prensa.","played":0,"pos":"expression","synonyms":[],"term":"a level playing field"},{"id":"p-a-quick-and-dirty-fix","antonyms":[],"cat":"it","es":"un apaño rápido","example":"It's a quick and dirty fix, but it will get us through the demo.","ipa":"","kind":"expression","meaning":"a fast solution that is not well made","note":"Tono de confesión entre desarrolladores.","played":0,"pos":"expression","synonyms":[],"term":"a quick and dirty fix"},{"id":"p-agile","antonyms":["clumsy","stiff"],"cat":"sport","es":"ágil","example":"Goalkeepers need to be agile as well as tall.","ipa":"/ˈædʒaɪl/","kind":"word","meaning":"able to move quickly and easily","played":0,"pos":"adj","synonyms":["nimble","quick"],"term":"agile"},{"id":"p-back-of-the-net","antonyms":[],"cat":"sport","es":"¡golazo!","example":"Got the job! Back of the net!","ipa":"","kind":"expression","meaning":"(UK, informal) a shout of joy at scoring or succeeding","note":"Grito de celebración, también en broma por algo bueno.","played":0,"pos":"expression","synonyms":[],"term":"back of the net"},{"id":"p-backlog","antonyms":[],"cat":"it","es":"trabajo pendiente","example":"The bug is near the top of the backlog.","ipa":"/ˈbæklɒɡ/","kind":"word","meaning":"a list of work still to be done","played":0,"pos":"noun","synonyms":["queue","to-do list"],"term":"backlog"},{"id":"p-bibliography","antonyms":[],"cat":"uni","es":"bibliografía","example":"Don't forget the bibliography at the end.","ipa":"/ˌbɪbliˈɒɡrəfi/","kind":"word","meaning":"a list of sources used in academic work","played":0,"pos":"noun","synonyms":["reference list"],"term":"bibliography"},{"id":"p-bless-you","antonyms":[],"cat":"england","es":"jesús / qué majo","example":"\"Achoo!\" \"Bless you!\"","ipa":"","kind":"expression","meaning":"said when someone sneezes, or to show tenderness","note":"Puede ir con cariño: \"aw, bless\".","played":0,"pos":"expression","synonyms":[],"term":"bless you"},{"id":"p-bloke","antonyms":[],"cat":"england","es":"tío","example":"He's a nice bloke once you get to know him.","ipa":"/bləʊk/","kind":"word","meaning":"(UK, informal) a man","played":0,"pos":"noun","synonyms":["guy","chap"],"term":"bloke"},{"id":"p-break-the-build","antonyms":[],"cat":"it","es":"romper la compilación","example":"Whoever breaks the build buys the coffee.","ipa":"","kind":"expression","meaning":"to make the code fail to compile or pass its checks","note":"Medio en broma: el que lo rompe suele pagar los cafés.","played":0,"pos":"expression","synonyms":[],"term":"break the build"},{"id":"p-can-t-complain","antonyms":[],"cat":"england","es":"no me quejo","example":"\"How's the new job?\" \"Can't complain.\"","ipa":"","kind":"expression","meaning":"a neutral answer to \"how are you?\"","note":"Respuesta clásica y breve.","played":0,"pos":"expression","synonyms":[],"term":"can't complain"},{"id":"p-cheeky","antonyms":["polite","respectful"],"cat":"england","es":"descarado, pillo","example":"Fancy a cheeky pint before dinner?","ipa":"/ˈtʃiːki/","kind":"word","meaning":"(UK) slightly rude in an amusing way","played":0,"pos":"adj","synonyms":["saucy","impudent"],"term":"cheeky"},{"id":"p-chuffed","antonyms":["gutted","disappointed"],"cat":"england","es":"encantado","example":"She was chuffed with her exam results.","ipa":"/tʃʌft/","kind":"word","meaning":"(UK, informal) very pleased","played":0,"pos":"adj","synonyms":["delighted","pleased"],"term":"chuffed"},{"id":"p-clinch","antonyms":["lose","forfeit"],"cat":"sport","es":"asegurarse (una victoria)","example":"They clinched the title on the last day.","ipa":"/klɪntʃ/","kind":"word","meaning":"to finally win something after a struggle","played":0,"pos":"verb","synonyms":["secure","seal"],"term":"clinch"},{"id":"p-commence","antonyms":["finish","conclude"],"cat":"general","es":"comenzar","example":"Lectures commence on the first Monday of term.","ipa":"/kəˈmens/","kind":"word","meaning":"(formal) to begin","played":0,"pos":"verb","synonyms":["begin","start"],"term":"commence"},{"id":"p-compile","antonyms":[],"cat":"it","es":"compilar","example":"It takes ten minutes to compile the whole project.","ipa":"/kəmˈpaɪl/","kind":"word","meaning":"to turn source code into a program","played":0,"pos":"verb","synonyms":["build"],"term":"compile"},{"id":"p-concurrency","antonyms":[],"cat":"it","es":"concurrencia","example":"Concurrency bugs are notoriously hard to reproduce.","ipa":"/kənˈkʌrənsi/","kind":"word","meaning":"several tasks running at overlapping times","played":0,"pos":"noun","synonyms":["parallelism"],"term":"concurrency"},{"id":"p-controversial","antonyms":["uncontroversial"],"cat":"general","es":"polémico","example":"The referee made a controversial decision.","ipa":"/ˌkɒntrəˈvɜːʃl/","kind":"word","meaning":"causing strong public disagreement","played":0,"pos":"adj","synonyms":["contentious","divisive"],"term":"controversial"},{"id":"p-cuppa","antonyms":[],"cat":"england","es":"un té","example":"Sit down and I'll make you a cuppa.","ipa":"/ˈkʌpə/","kind":"word","meaning":"(UK, informal) a cup of tea","played":0,"pos":"noun","synonyms":["brew"],"term":"cuppa"},{"id":"p-cutting-edge","antonyms":["outdated"],"cat":"it","es":"puntero","example":"The lab works on cutting-edge chip design.","ipa":"/ˌkʌtɪŋ ˈedʒ/","kind":"word","meaning":"the newest and most advanced","played":0,"pos":"adj","synonyms":["state-of-the-art","pioneering"],"term":"cutting-edge"},{"id":"p-deprecate","antonyms":["support","maintain"],"cat":"it","es":"marcar como obsoleto","example":"The team deprecated the old endpoint last year.","ipa":"/ˈdeprəkeɪt/","kind":"word","meaning":"to mark a feature as no longer recommended","played":0,"pos":"verb","synonyms":["phase out","retire"],"term":"deprecate"},{"id":"p-dissertation","antonyms":[],"cat":"uni","es":"trabajo de fin de grado","example":"She is writing her dissertation on compilers.","ipa":"/ˌdɪsəˈteɪʃn/","kind":"word","meaning":"a long piece of writing for a degree","played":0,"pos":"noun","synonyms":["thesis"],"term":"dissertation"},{"id":"p-dodgy","antonyms":["reliable","trustworthy"],"cat":"england","es":"chungo","example":"That kebab van looks a bit dodgy.","ipa":"/ˈdɒdʒi/","kind":"word","meaning":"(UK, informal) suspicious or unreliable","played":0,"pos":"adj","synonyms":["shady","suspect"],"term":"dodgy"},{"id":"p-dominant","antonyms":["weak","subordinate"],"cat":"sport","es":"dominante","example":"It was the most dominant performance of the season.","ipa":"/ˈdɒmɪnənt/","kind":"word","meaning":"stronger and more successful than the others","played":0,"pos":"adj","synonyms":["commanding","supreme"],"term":"dominant"},{"id":"p-down-the-rabbit-hole","antonyms":[],"cat":"it","es":"perdido en un tema sin fin","example":"I went down the rabbit hole reading about compilers.","ipa":"","kind":"expression","meaning":"lost in a long and absorbing investigation","note":"Normalmente con \"go\": \"I went down a rabbit hole debugging that\".","played":0,"pos":"expression","synonyms":[],"term":"down the rabbit hole"},{"id":"p-draw-on-evidence","antonyms":[],"cat":"uni","es":"apoyarse en datos","example":"Your essay should draw on evidence from recent studies.","ipa":"","kind":"expression","meaning":"to use evidence as support","note":"Muy usada en ensayos.","played":0,"pos":"expression","synonyms":[],"term":"draw on evidence"},{"id":"p-drop-the-ball","antonyms":[],"cat":"sport","es":"meter la pata","example":"Sorry, I dropped the ball on that email.","ipa":"","kind":"expression","meaning":"to make a careless mistake","note":"Muy usada también en la oficina.","played":0,"pos":"expression","synonyms":[],"term":"drop the ball"},{"id":"p-encrypt","antonyms":["decrypt"],"cat":"it","es":"cifrar","example":"Always encrypt passwords before storing them.","ipa":"/ɪnˈkrɪpt/","kind":"word","meaning":"to convert data into a secret code","played":0,"pos":"verb","synonyms":["encode","scramble"],"term":"encrypt"},{"id":"p-equaliser","antonyms":[],"cat":"sport","es":"gol del empate","example":"He headed in a last-minute equaliser.","ipa":"/ˈiːkwəlaɪzə/","kind":"word","meaning":"(UK) a goal that levels the score","played":0,"pos":"noun","synonyms":["levelling goal"],"term":"equaliser"},{"id":"p-ey-up","antonyms":[],"cat":"england","es":"¡buenas! (Yorkshire)","example":"Ey up, how's it going?","ipa":"","kind":"expression","meaning":"(Yorkshire) hello; or look out","note":"La oirás en York. Se pronuncia \"ay-up\".","played":0,"pos":"expression","synonyms":[],"term":"ey up"},{"id":"p-faff","antonyms":[],"cat":"england","es":"marear la perdiz","example":"Stop faffing and get on the train.","ipa":"/fæf/","kind":"word","meaning":"(UK, informal) to waste time doing unimportant things","played":0,"pos":"verb","synonyms":["dither","mess about"],"term":"faff"},{"id":"p-fingers-crossed","antonyms":[],"cat":"england","es":"crucemos los dedos","example":"Results come out tomorrow, so fingers crossed.","ipa":"","kind":"expression","meaning":"hoping for a good result","note":"Se dice también sin hacer el gesto.","played":0,"pos":"expression","synonyms":[],"term":"fingers crossed"},{"id":"p-fixture","antonyms":[],"cat":"sport","es":"partido programado","example":"York City have a tough fixture this weekend.","ipa":"/ˈfɪkstʃə/","kind":"word","meaning":"(UK) a sports match on a fixed date","played":0,"pos":"noun","synonyms":["match","game"],"term":"fixture"},{"id":"p-freshers-week","antonyms":[],"cat":"uni","es":"semana de bienvenida","example":"I joined three societies during freshers' week.","ipa":"","kind":"expression","meaning":"the welcome week for new university students","note":"Fiestas, sociedades y mucha gente nueva.","played":0,"pos":"expression","synonyms":[],"term":"freshers' week"},{"id":"p-glitch","antonyms":[],"cat":"it","es":"fallo técnico","example":"A glitch in the payment system delayed the launch.","ipa":"/ɡlɪtʃ/","kind":"word","meaning":"a small, temporary fault","played":0,"pos":"noun","synonyms":["bug","hiccup"],"term":"glitch"},{"id":"p-gobsmacked","antonyms":["unimpressed"],"cat":"england","es":"boquiabierto","example":"I was gobsmacked by the price of rent.","ipa":"/ˈɡɒbsmækt/","kind":"word","meaning":"(UK, informal) completely astonished","played":0,"pos":"adj","synonyms":["astonished","stunned"],"term":"gobsmacked"},{"id":"p-gutted","antonyms":["delighted","over the moon"],"cat":"england","es":"hecho polvo (de pena)","example":"I was gutted when we lost in the final.","ipa":"/ˈɡʌtɪd/","kind":"word","meaning":"(UK, informal) extremely disappointed","played":0,"pos":"adj","synonyms":["devastated","crushed"],"term":"gutted"},{"id":"p-hypothesis","antonyms":["fact"],"cat":"uni","es":"hipótesis","example":"Our hypothesis turned out to be wrong.","ipa":"/haɪˈpɒθəsɪs/","kind":"word","meaning":"an idea that has yet to be proved","played":0,"pos":"noun","synonyms":["theory","assumption"],"term":"hypothesis"},{"id":"p-i-can-t-be-bothered","antonyms":[],"cat":"england","es":"no me apetece nada / qué pereza","example":"I can't be bothered to cook tonight.","ipa":"","kind":"expression","meaning":"I don't have the motivation to do something","note":"Coloquial y constante.","played":0,"pos":"expression","synonyms":[],"term":"I can't be bothered"},{"id":"p-i-ll-be-there-in-a-sec","antonyms":[],"cat":"england","es":"voy en un segundo","example":"Hang on, I'll be there in a sec.","ipa":"","kind":"expression","meaning":"I will come very soon","note":"\"Sec\" = second. Muy cotidiana.","played":0,"pos":"expression","synonyms":[],"term":"I'll be there in a sec"},{"id":"p-i-ll-have-a-think","antonyms":[],"cat":"england","es":"me lo pienso","example":"Thanks for the offer. I'll have a think.","ipa":"","kind":"expression","meaning":"I will consider it, often meaning a polite no","note":"A veces es un \"no\" educado.","played":0,"pos":"expression","synonyms":[],"term":"I'll have a think"},{"id":"p-i-m-easy","antonyms":[],"cat":"england","es":"me da igual","example":"\"Pizza or curry?\" \"I'm easy.\"","ipa":"","kind":"expression","meaning":"I don't mind which option","note":"Ojo: en UK no tiene nada raro. Se dice al elegir plan o comida.","played":0,"pos":"expression","synonyms":[],"term":"I'm easy"},{"id":"p-in-a-nutshell","antonyms":[],"cat":"uni","es":"en pocas palabras","example":"In a nutshell, the algorithm sorts by frequency.","ipa":"","kind":"expression","meaning":"in very few words","note":"Muy útil al resumir en un seminario.","played":0,"pos":"expression","synonyms":[],"term":"in a nutshell"},{"id":"p-inevitable","antonyms":["avoidable","unlikely"],"cat":"general","es":"inevitable","example":"Mistakes are inevitable when you learn a language.","ipa":"/ɪnˈevɪtəbl/","kind":"word","meaning":"certain to happen","played":0,"pos":"adj","synonyms":["unavoidable","certain"],"term":"inevitable"},{"id":"p-intuitive","antonyms":["confusing","unintuitive"],"cat":"it","es":"intuitivo","example":"A good interface feels intuitive from the first click.","ipa":"/ɪnˈtjuːɪtɪv/","kind":"word","meaning":"easy to use without being taught","played":0,"pos":"adj","synonyms":["user-friendly","straightforward"],"term":"intuitive"},{"id":"p-it-s-my-round","antonyms":[],"cat":"england","es":"esta ronda la pago yo","example":"Put your wallet away, it's my round.","ipa":"","kind":"expression","meaning":"it is my turn to buy drinks","note":"Norma sagrada del pub: cada uno paga una ronda.","played":0,"pos":"expression","synonyms":[],"term":"it's my round"},{"id":"p-it-s-not-rocket-science","antonyms":[],"cat":"england","es":"no es tan difícil","example":"Just restart the server; it's not rocket science.","ipa":"","kind":"expression","meaning":"it is not difficult to understand","note":"Algo sarcástica.","played":0,"pos":"expression","synonyms":[],"term":"it's not rocket science"},{"id":"p-it-works-on-my-machine","antonyms":[],"cat":"it","es":"\"en mi ordenador funciona\"","example":"\"It works on my machine\" won't convince your tutor.","ipa":"","kind":"expression","meaning":"an excuse used when a bug cannot be reproduced","note":"Broma universal entre programadores.","played":0,"pos":"expression","synonyms":[],"term":"it works on my machine"},{"id":"p-keep-your-eye-on-the-ball","antonyms":[],"cat":"sport","es":"no perder de vista lo importante","example":"Keep your eye on the ball and finish the coursework first.","ipa":"","kind":"expression","meaning":"to stay focused on what matters","note":"Literal en deporte, figurada en la vida.","played":0,"pos":"expression","synonyms":[],"term":"keep your eye on the ball"},{"id":"p-knackering","antonyms":["relaxing"],"cat":"england","es":"agotador","example":"Night shifts are absolutely knackering.","ipa":"/ˈnækərɪŋ/","kind":"word","meaning":"(UK, informal) extremely tiring","played":0,"pos":"adj","synonyms":["exhausting","draining"],"term":"knackering"},{"id":"p-latency","antonyms":[],"cat":"it","es":"latencia","example":"Users notice latency above about 100 milliseconds.","ipa":"/ˈleɪtənsi/","kind":"word","meaning":"the delay before data starts to move","played":0,"pos":"noun","synonyms":["delay","lag"],"term":"latency"},{"id":"p-love","antonyms":[],"cat":"england","es":"cariño / guapo","example":"That's two pounds fifty, love.","ipa":"","kind":"expression","meaning":"(Northern England) a friendly word for anyone","note":"Lo dirán en tiendas y buses: no es flirteo.","played":0,"pos":"expression","synonyms":[],"term":"love"},{"id":"p-mate","antonyms":["stranger"],"cat":"england","es":"colega","example":"Cheers, mate, I owe you one.","ipa":"/meɪt/","kind":"word","meaning":"(UK, informal) a friend; also a friendly form of address","played":0,"pos":"noun","synonyms":["pal","buddy"],"term":"mate"},{"id":"p-move-the-goalposts","antonyms":[],"cat":"sport","es":"cambiar las reglas a mitad del juego","example":"The client keeps moving the goalposts.","ipa":"","kind":"expression","meaning":"to change the rules unfairly during a process","note":"Del fútbol, muy usada en el trabajo.","played":0,"pos":"expression","synonyms":[],"term":"move the goalposts"},{"id":"p-mustn-t-grumble","antonyms":[],"cat":"england","es":"no me puedo quejar","example":"\"How are things?\" \"Mustn't grumble.\"","ipa":"","kind":"expression","meaning":"an ironic way of saying life is fine","note":"Frase típica, sobre todo de gente mayor.","played":0,"pos":"expression","synonyms":[],"term":"mustn't grumble"},{"id":"p-naff","antonyms":["stylish","cool"],"cat":"england","es":"cutre","example":"That jumper is a bit naff, to be honest.","ipa":"/næf/","kind":"word","meaning":"(UK, informal) unfashionable or of poor taste","played":0,"pos":"adj","synonyms":["tacky","lame"],"term":"naff"},{"id":"p-not-too-bad","antonyms":[],"cat":"england","es":"no me quejo","example":"\"How was the exam?\" \"Not too bad, thanks.\"","ipa":"","kind":"expression","meaning":"a typical answer meaning \"I'm fine\"","note":"Puede significar desde \"normal\" hasta \"muy bien\".","played":0,"pos":"expression","synonyms":[],"term":"not too bad"},{"id":"p-nuance","antonyms":[],"cat":"general","es":"matiz","example":"Translation loses a lot of nuance.","ipa":"/ˈnjuːɑːns/","kind":"word","meaning":"a very slight difference in meaning","played":0,"pos":"noun","synonyms":["subtlety","shade"],"term":"nuance"},{"id":"p-on-the-ropes","antonyms":[],"cat":"sport","es":"contra las cuerdas","example":"The champions are on the ropes after three defeats.","ipa":"","kind":"expression","meaning":"in serious trouble and close to losing","note":"Del boxeo. Común en titulares.","played":0,"pos":"expression","synonyms":[],"term":"on the ropes"},{"id":"p-once-in-a-blue-moon","antonyms":[],"cat":"general","es":"de Pascuas a Ramos","example":"I only drink coffee once in a blue moon.","ipa":"","kind":"expression","meaning":"very rarely","note":"Informal, habitual.","played":0,"pos":"expression","synonyms":[],"term":"once in a blue moon"},{"id":"p-out-of-the-box","antonyms":[],"cat":"it","es":"sin configurar nada","example":"The library works out of the box.","ipa":"","kind":"expression","meaning":"working straight away, with no setup","note":"Típico de documentación: \"it works out of the box\".","played":0,"pos":"expression","synonyms":[],"term":"out of the box"},{"id":"p-outage","antonyms":["uptime"],"cat":"it","es":"caída del servicio","example":"The outage lasted three hours.","ipa":"/ˈaʊtɪdʒ/","kind":"word","meaning":"a period when a service stops working","played":0,"pos":"noun","synonyms":["downtime","failure"],"term":"outage"},{"id":"p-overhaul","antonyms":["preserve"],"cat":"it","es":"revisar a fondo","example":"We need to overhaul the build pipeline.","ipa":"/ˌəʊvəˈhɔːl/","kind":"word","meaning":"to examine and improve something completely","played":0,"pos":"verb","synonyms":["revamp","rebuild"],"term":"overhaul"},{"id":"p-overtake","antonyms":["fall behind"],"cat":"sport","es":"adelantar","example":"She overtook the leader on the final lap.","ipa":"/ˌəʊvəˈteɪk/","kind":"word","meaning":"to go past someone moving in the same direction","played":0,"pos":"verb","synonyms":["pass","outpace"],"term":"overtake"},{"id":"p-overwhelming","antonyms":["minor","negligible"],"cat":"general","es":"abrumador","example":"The first week abroad can be overwhelming.","ipa":"/ˌəʊvəˈwelmɪŋ/","kind":"word","meaning":"very great or too strong to handle","played":0,"pos":"adj","synonyms":["staggering","crushing"],"term":"overwhelming"},{"id":"p-paraphrase","antonyms":["quote"],"cat":"uni","es":"parafrasear","example":"Paraphrase the source instead of copying it.","ipa":"/ˈpærəfreɪz/","kind":"word","meaning":"to express something using different words","played":0,"pos":"verb","synonyms":["reword","rephrase"],"term":"paraphrase"},{"id":"p-park-the-bus","antonyms":[],"cat":"sport","es":"encerrarse atrás","example":"They parked the bus and held on for a draw.","ipa":"","kind":"expression","meaning":"(football) to defend with almost the whole team","note":"Jerga futbolera habitual.","played":0,"pos":"expression","synonyms":[],"term":"park the bus"},{"id":"p-patch","antonyms":[],"cat":"it","es":"parche","example":"Install the security patch as soon as you can.","ipa":"/pætʃ/","kind":"word","meaning":"a small update that fixes a problem","played":0,"pos":"noun","synonyms":["fix","hotfix"],"term":"patch"},{"id":"p-peckish","antonyms":["full","stuffed"],"cat":"england","es":"con un poco de hambre","example":"I'm feeling peckish. Shall we get some chips?","ipa":"/ˈpekɪʃ/","kind":"word","meaning":"(UK) slightly hungry","played":0,"pos":"adj","synonyms":["hungry"],"term":"peckish"},{"id":"p-pitch","antonyms":[],"cat":"sport","es":"campo","example":"Fans ran onto the pitch at the final whistle.","ipa":"/pɪtʃ/","kind":"word","meaning":"(UK) the field where football or rugby is played","played":0,"pos":"noun","synonyms":["field","ground"],"term":"pitch"},{"id":"p-pop-to-the-shops","antonyms":[],"cat":"england","es":"acercarse a la tienda","example":"I'm just popping to the shops for some milk.","ipa":"","kind":"expression","meaning":"to go to the shops for a short time","note":"\"Pop\" sirve con todo: \"pop in\", \"pop round\".","played":0,"pos":"expression","synonyms":["nip to the shops"],"term":"pop to the shops"},{"id":"p-pragmatic","antonyms":["idealistic"],"cat":"general","es":"pragmático","example":"We took a pragmatic approach to the deadline.","ipa":"/præɡˈmætɪk/","kind":"word","meaning":"dealing with things in a practical way","played":0,"pos":"adj","synonyms":["practical","realistic"],"term":"pragmatic"},{"id":"p-queue","antonyms":[],"cat":"england","es":"cola","example":"The queue for the bus went round the corner.","ipa":"/kjuː/","kind":"word","meaning":"(UK) a line of people waiting","played":0,"pos":"noun","synonyms":["line"],"term":"queue"},{"id":"p-raises-the-question-of","antonyms":[],"cat":"uni","es":"plantea la cuestión de","example":"This raises the question of who owns the data.","ipa":"","kind":"expression","meaning":"makes people ask about","note":"Frase académica, formal.","played":0,"pos":"expression","synonyms":[],"term":"raises the question of"},{"id":"p-redundant","antonyms":["essential","necessary"],"cat":"it","es":"redundante","example":"Delete that redundant check; the compiler already does it.","ipa":"/rɪˈdʌndənt/","kind":"word","meaning":"not needed, or duplicated as a backup","played":0,"pos":"adj","synonyms":["superfluous","duplicate"],"term":"redundant"},{"id":"p-referee","antonyms":[],"cat":"sport","es":"árbitro","example":"The referee blew for a penalty.","ipa":"/ˌrefəˈriː/","kind":"word","meaning":"the official who controls a match","played":0,"pos":"noun","synonyms":["umpire","official"],"term":"referee"},{"id":"p-reinvent-the-wheel","antonyms":[],"cat":"it","es":"reinventar la rueda","example":"Use the standard library; don't reinvent the wheel.","ipa":"","kind":"expression","meaning":"to waste time creating something that already exists","note":"Crítica clásica al escribir lo que ya hace una librería.","played":0,"pos":"expression","synonyms":[],"term":"reinvent the wheel"},{"id":"p-relegation","antonyms":["promotion"],"cat":"sport","es":"descenso","example":"The club is fighting relegation again.","ipa":"/ˌrelɪˈɡeɪʃn/","kind":"word","meaning":"moving down to a lower league","played":0,"pos":"noun","synonyms":["demotion"],"term":"relegation"},{"id":"p-rival","antonyms":["ally","teammate"],"cat":"sport","es":"rival","example":"Leeds and Manchester United are old rivals.","ipa":"/ˈraɪvl/","kind":"word","meaning":"a person or team you compete against","played":0,"pos":"noun","synonyms":["opponent","competitor"],"term":"rival"},{"id":"p-roll-back-a-release","antonyms":[],"cat":"it","es":"volver a la versión anterior","example":"We had to roll back a release after the outage.","ipa":"","kind":"expression","meaning":"to return to a previous version","note":"Cuando un despliegue sale mal.","played":0,"pos":"expression","synonyms":[],"term":"roll back a release"},{"id":"p-seamless","antonyms":["clunky","disjointed"],"cat":"it","es":"fluido, sin cortes","example":"The migration was seamless for our customers.","ipa":"/ˈsiːmləs/","kind":"word","meaning":"smooth, with no obvious problems or breaks","played":0,"pos":"adj","synonyms":["smooth","effortless"],"term":"seamless"},{"id":"p-see-you-later","antonyms":[],"cat":"england","es":"hasta luego","example":"Right, see you later!","ipa":"","kind":"expression","meaning":"a goodbye, even if you won't see the person later","note":"No implica que vayáis a veros luego.","played":0,"pos":"expression","synonyms":["see you in a bit"],"term":"see you later"},{"id":"p-ship-a-feature","antonyms":[],"cat":"it","es":"lanzar una funcionalidad","example":"We ship a feature every two weeks.","ipa":"","kind":"expression","meaning":"to release something to users","note":"Jerga habitual de equipos de producto.","played":0,"pos":"expression","synonyms":[],"term":"ship a feature"},{"id":"p-sit-on-the-fence","antonyms":[],"cat":"general","es":"no mojarse","example":"You can't sit on the fence in a debate.","ipa":"","kind":"expression","meaning":"to avoid taking sides","note":"Se usa en debates: \"stop sitting on the fence\".","played":0,"pos":"expression","synonyms":[],"term":"sit on the fence"},{"id":"p-skint","antonyms":["loaded","flush"],"cat":"england","es":"sin blanca","example":"I can't come out, I'm skint until payday.","ipa":"/skɪnt/","kind":"word","meaning":"(UK, informal) having no money","played":0,"pos":"adj","synonyms":["broke","penniless"],"term":"skint"},{"id":"p-sorted","antonyms":[],"cat":"england","es":"listo, solucionado","example":"I'll book the tickets, and that's us sorted.","ipa":"","kind":"expression","meaning":"(UK, informal) fixed or arranged; all fine","note":"\"Sorted!\" vale para cerrar cualquier gestión.","played":0,"pos":"expression","synonyms":[],"term":"sorted"},{"id":"p-spectator","antonyms":["participant"],"cat":"sport","es":"espectador","example":"Thousands of spectators lined the route.","ipa":"/spekˈteɪtə/","kind":"word","meaning":"a person who watches an event","played":0,"pos":"noun","synonyms":["onlooker","viewer"],"term":"spectator"},{"id":"p-spill-the-beans","antonyms":[],"cat":"general","es":"descubrir el pastel","example":"Come on, spill the beans!","ipa":"","kind":"expression","meaning":"to reveal a secret","note":"Informal.","played":0,"pos":"expression","synonyms":[],"term":"spill the beans"},{"id":"p-sportsmanship","antonyms":["unsportsmanlike conduct"],"cat":"sport","es":"deportividad","example":"Shaking hands is a basic act of sportsmanship.","ipa":"/ˈspɔːtsmənʃɪp/","kind":"word","meaning":"fair and generous behaviour in sport","played":0,"pos":"noun","synonyms":["fair play"],"term":"sportsmanship"},{"id":"p-sprain","antonyms":[],"cat":"sport","es":"hacerse un esguince","example":"I sprained my ankle at five-a-side.","ipa":"/spreɪn/","kind":"word","meaning":"to injure a joint by twisting it","played":0,"pos":"verb","synonyms":["twist","wrench"],"term":"sprain"},{"id":"p-stamina","antonyms":["fatigue"],"cat":"sport","es":"aguante","example":"Long-distance running builds stamina.","ipa":"/ˈstæmɪnə/","kind":"word","meaning":"the ability to keep going physically","played":0,"pos":"noun","synonyms":["endurance","staying power"],"term":"stamina"},{"id":"p-streamline","antonyms":["complicate"],"cat":"it","es":"agilizar","example":"Automation can streamline code reviews.","ipa":"/ˈstriːmlaɪn/","kind":"word","meaning":"to make a process simpler and more efficient","played":0,"pos":"verb","synonyms":["simplify","optimise"],"term":"streamline"},{"id":"p-substitute","antonyms":["starter"],"cat":"sport","es":"suplente","example":"The substitute scored within two minutes.","ipa":"/ˈsʌbstɪtjuːt/","kind":"word","meaning":"a player who replaces another during a match","played":0,"pos":"noun","synonyms":["replacement","reserve"],"term":"substitute"},{"id":"p-take-one-for-the-team","antonyms":[],"cat":"sport","es":"sacrificarse por el equipo","example":"I'll take one for the team and present first.","ipa":"","kind":"expression","meaning":"to accept something unpleasant to help the group","note":"Informal, con humor.","played":0,"pos":"expression","synonyms":[],"term":"take one for the team"},{"id":"p-take-the-mickey","antonyms":[],"cat":"england","es":"tomar el pelo","example":"They're only taking the mickey out of your accent.","ipa":"","kind":"expression","meaning":"(UK, informal) to tease someone","note":"Es normal entre amigos: es señal de confianza.","played":0,"pos":"expression","synonyms":["take the mick"],"term":"take the mickey"},{"id":"p-technical-debt","antonyms":[],"cat":"it","es":"deuda técnica","example":"We spent the sprint paying off technical debt.","ipa":"","kind":"expression","meaning":"the future cost of taking a shortcut in code","note":"Término profesional, no es informal.","played":0,"pos":"expression","synonyms":[],"term":"technical debt"},{"id":"p-that-s-a-bit-much","antonyms":[],"cat":"england","es":"eso es pasarse","example":"Fifty quid for a taxi? That's a bit much.","ipa":"","kind":"expression","meaning":"that is excessive or unfair","note":"Se queja con suavidad muy británica.","played":0,"pos":"expression","synonyms":[],"term":"that's a bit much"},{"id":"p-the-ball-is-in-your-court","antonyms":[],"cat":"it","es":"la pelota está en tu tejado","example":"I've sent my offer, so the ball is in your court.","ipa":"","kind":"expression","meaning":"it is your turn to act","note":"Se usa también en el trabajo cuando esperas la respuesta de otro.","played":0,"pos":"expression","synonyms":[],"term":"the ball is in your court"},{"id":"p-the-extent-to-which","antonyms":[],"cat":"uni","es":"hasta qué punto","example":"Discuss the extent to which AI affects productivity.","ipa":"","kind":"expression","meaning":"how far something is true","note":"Aparece en muchísimos enunciados de ensayo.","played":0,"pos":"expression","synonyms":[],"term":"the extent to which"},{"id":"p-the-final-whistle","antonyms":[],"cat":"sport","es":"el pitido final","example":"Fans sang long after the final whistle.","ipa":"","kind":"expression","meaning":"the end of a match","note":"Literal, y también figurado.","played":0,"pos":"expression","synonyms":[],"term":"the final whistle"},{"id":"p-the-last-straw","antonyms":[],"cat":"general","es":"la gota que colma el vaso","example":"The broken boiler was the last straw.","ipa":"","kind":"expression","meaning":"the final problem that makes a situation unbearable","note":"Para decir que algo ha acabado con tu paciencia.","played":0,"pos":"expression","synonyms":[],"term":"the last straw"},{"id":"p-thrash","antonyms":["lose to"],"cat":"sport","es":"dar una paliza","example":"They thrashed us six–nil.","ipa":"/θræʃ/","kind":"word","meaning":"(informal) to defeat easily","played":0,"pos":"verb","synonyms":["hammer","crush"],"term":"thrash"},{"id":"p-throw-in-the-towel","antonyms":[],"cat":"sport","es":"tirar la toalla","example":"Don't throw in the towel after one bad mark.","ipa":"","kind":"expression","meaning":"to give up","note":"Igual que en español.","played":0,"pos":"expression","synonyms":[],"term":"throw in the towel"},{"id":"p-to-be-fair","antonyms":[],"cat":"england","es":"la verdad es que / siendo justos","example":"To be fair, the rent is cheap for York.","ipa":"","kind":"expression","meaning":"used to add a balancing point","note":"Una de las muletillas más oídas en Inglaterra.","played":0,"pos":"expression","synonyms":[],"term":"to be fair"},{"id":"p-to-be-honest","antonyms":[],"cat":"england","es":"sinceramente","example":"To be honest, I didn't enjoy the film.","ipa":"","kind":"expression","meaning":"used before giving your real opinion","note":"A menudo abreviado \"tbh\" por escrito.","played":0,"pos":"expression","synonyms":[],"term":"to be honest"},{"id":"p-tournament","antonyms":[],"cat":"sport","es":"torneo","example":"Wimbledon is the oldest tennis tournament in the world.","ipa":"/ˈtʊənəmənt/","kind":"word","meaning":"a competition with many matches","played":0,"pos":"noun","synonyms":["championship","competition"],"term":"tournament"},{"id":"p-tuition","antonyms":[],"cat":"uni","es":"matrícula, enseñanza","example":"Tuition is higher for international students.","ipa":"/tjuˈɪʃn/","kind":"word","meaning":"teaching, or the fees paid for it","played":0,"pos":"noun","synonyms":["teaching","instruction"],"term":"tuition"},{"id":"p-under-the-hood","antonyms":[],"cat":"it","es":"por dentro, a nivel interno","example":"Under the hood, the app is just a big spreadsheet.","ipa":"","kind":"expression","meaning":"in the internal workings of a system","note":"Muy usada entre programadores. En UK el coche tiene \"bonnet\", pero se dice igual \"under the hood\".","played":0,"pos":"expression","synonyms":["under the bonnet"],"term":"under the hood"},{"id":"p-underdog","antonyms":["favourite"],"cat":"sport","es":"el que no parte como favorito","example":"Everyone in England loves an underdog.","ipa":"/ˈʌndədɒɡ/","kind":"word","meaning":"the competitor expected to lose","played":0,"pos":"noun","synonyms":["outsider"],"term":"underdog"},{"id":"p-undergraduate","antonyms":["postgraduate"],"cat":"uni","es":"estudiante de grado","example":"Undergraduates can use the library all night.","ipa":"/ˌʌndəˈɡrædʒuət/","kind":"word","meaning":"a student taking a first degree","played":0,"pos":"noun","synonyms":["fresher (first year)"],"term":"undergraduate"},{"id":"p-versatile","antonyms":["limited","inflexible"],"cat":"it","es":"versátil","example":"Python is a remarkably versatile language.","ipa":"/ˈvɜːsətaɪl/","kind":"word","meaning":"able to do many different things","played":0,"pos":"adj","synonyms":["adaptable","flexible"],"term":"versatile"},{"id":"p-vulnerability","antonyms":["strength"],"cat":"it","es":"vulnerabilidad","example":"The audit found a serious vulnerability in the login form.","ipa":"/ˌvʌlnərəˈbɪləti/","kind":"word","meaning":"a weakness that can be attacked","played":0,"pos":"noun","synonyms":["weakness","flaw"],"term":"vulnerability"},{"id":"p-with-all-due-respect","antonyms":[],"cat":"england","es":"con todo el respeto","example":"With all due respect, that's not what the data shows.","ipa":"","kind":"expression","meaning":"a polite start, usually before disagreeing strongly","note":"Cuidado: suele anunciar un desacuerdo fuerte.","played":0,"pos":"expression","synonyms":[],"term":"with all due respect"},{"id":"p-you-alright","antonyms":[],"cat":"england","es":"¿qué tal?","example":"\"You alright?\" \"Yeah, not bad, you?\"","ipa":"","kind":"expression","meaning":"a casual greeting in England, not a real question","note":"Es un saludo. Responde \"yeah, you?\" y sigue andando.","played":0,"pos":"expression","synonyms":["alright?"],"term":"you alright?"},{"id":"p-you-re-alright","antonyms":[],"cat":"england","es":"no hace falta / no pasa nada","example":"\"Need a hand?\" \"You're alright, thanks.\"","ipa":"","kind":"expression","meaning":"a polite way of saying no thanks or no problem","note":"\"Do you want a bag?\" \"You're alright, thanks.\"","played":0,"pos":"expression","synonyms":[],"term":"you're alright"}],"articles":[{"id":"ai-pair","added":1,"body":"A few years ago, a junior developer learned the craft by getting stuck. You stared at a stack trace, searched for an answer, read a dozen unhelpful forum posts and finally, with some reluctance, asked a senior colleague. Today the same developer can describe the problem to an AI assistant and receive working code in seconds. The gain in speed is real, and it would be foolish to pretend otherwise. The harder question is what happens to the learning that used to take place along the way.\n\nWriting code was never the whole job. Much of a software engineer's value lies in deciding what to build, spotting the requirement nobody mentioned and knowing which risk is worth taking. Assistants are remarkably good at producing plausible solutions, but plausible is not the same as correct, and a confident mistake can be harder to catch than a hesitant one. The developer who cannot read the output critically is not so much collaborating as gambling.\n\nSensible students are therefore treating these tools as a demanding colleague rather than an oracle. They attempt a problem first, ask the assistant to review their work and then make it explain its reasoning. They write the tests themselves, because a test is a statement of what you believe should be true. Above all, they stay curious about the failures, which remain the most reliable teachers in the field.\n\nNobody knows exactly how the profession will look by the time today's first-years graduate. Yet the skills most likely to last are old-fashioned: clear thinking, clear writing and the patience to ask why. If anything, the arrival of a colleague who never sleeps makes those human habits more valuable, not less.","minutes":2,"source":"seed","title":"The Colleague Who Never Sleeps","topic":"Software"},{"id":"british-seminar","added":1,"body":"Nothing quite prepares an international student for the first seminar at a British university. You have done the reading, you have underlined half the chapter, and you take your seat fully expecting the tutor to explain what it all means. Instead, the tutor asks what you think, then waits. The silence that follows can feel endless.\n\nThis is not laziness. Small-group teaching rests on the assumption that understanding is built through discussion, and that a half-formed idea offered aloud is worth more than a perfect one kept to yourself. Nobody expects a polished lecture. In fact, the most useful contributions are often tentative ones, which is where the famous British habit of hedging becomes a genuine academic skill. Phrases such as \"I wonder whether\" or \"it could be argued that\" allow you to test a claim without staking your reputation on it.\n\nDisagreement works in a similar way. In some educational cultures, challenging a tutor would be disrespectful; here it is closer to a compliment. You are not, however, expected to contradict anybody bluntly. \"That's interesting, but I'm not sure it applies to...\" will do far more than \"No, that's wrong\", even though both mean more or less the same thing.\n\nIf speaking up still feels daunting, set yourself a small target: one contribution per session, prepared in advance if necessary. Asking a clarifying question counts. So does building on what a classmate has just said. By the middle of term, most students notice that the voice they were afraid of sounding foolish in has gradually become their own. Your accent, far from being a hindrance, will almost certainly be the least interesting thing about what you say.","minutes":2,"source":"seed","title":"Surviving the British Seminar","topic":"University"},{"id":"numbers-on-the-pitch","added":1793953000000,"body":"For most of its history, football ran on instinct. Scouts trusted their eyes, managers trusted their gut, and anyone who suggested consulting a spreadsheet would have been laughed out of the dressing room. Today, top clubs employ analysts with degrees in physics, and their work has quietly transformed the game.\n\nThe best-known invention is expected goals, or xG, a measure of how likely a given shot is to go in, based on thousands of similar attempts. It sounds dry, but its implications are striking. A team can lose a match while creating better chances, which means a poor result may be bad luck rather than bad football. Clubs such as Brentford have built their recruitment on data of this kind, finding bargains that wealthier rivals overlook.\n\nNot everyone is convinced. Critics argue that a model cannot capture leadership, nerve or the mood of a crowd, and they have a point. Data describes the past, and players are not machines. The smartest clubs therefore treat the numbers as an extra opinion in the room, rather than a verdict.\n\nFor a software student, the appeal is obvious: this is a domain where messy human behaviour meets clean code. And for the rest of us it offers a useful warning. Whenever a pundit claims that a team simply wanted it more, ask to see the evidence.","minutes":1,"source":"seed","title":"Numbers on the Pitch","topic":"Deportes"},{"id":"open-source-volunteers","added":1793953000000,"body":"Every time you book a train, stream a match or pay a bill, you depend on software written by people you will never meet, many of whom were never paid for it. This is the strange bargain at the heart of the modern internet: some of its most critical components are maintained by a handful of volunteers in their spare time.\n\nUsually the arrangement works remarkably well, which is why nobody thinks about it. Then something breaks. In 2016 a developer removed a tiny package of eleven lines from the npm registry, and builds failed around the world. Five years later, a flaw in Log4j, a logging library found almost everywhere, sent companies into a panic, while its unpaid maintainers worked through the weekends to fix it.\n\nThese incidents expose a question of responsibility. Huge corporations build fortunes on top of free code, yet contribute little in return. Some now fund foundations or pay staff to work on shared projects, but the support remains uneven.\n\nFor a student, there is an opportunity here. Contributing to an open-source project is one of the best ways of learning how real software is built. Start small: fix some documentation, reproduce a bug, write a test. You will have your code reviewed by experienced strangers, which can be humbling, and you will quietly become one of the people holding it all together.","minutes":1,"source":"seed","title":"Held Together by Volunteers","topic":"Informática"},{"id":"small-talk","added":1,"body":"\"Lovely weather we're having,\" says the person next to you at the bus stop, while rain trickles down your neck. You are not being asked for a forecast. You are being offered, in the only acceptable form available, a small act of friendliness.\n\nNewcomers to Britain often dismiss this kind of talk as empty. Linguists see it differently. The anthropologist Bronisław Malinowski called it \"phatic communion\": speech whose purpose is social rather than informational. When two neighbours agree that it's a bit chilly, no knowledge changes hands, but something important has happened all the same. Each has confirmed that the other is harmless, approachable and willing to play by the rules.\n\nThose rules are subtle, and much of the difficulty lies in decoding what people do not say. \"Not bad\" may be high praise. \"Interesting\" may be a polite way of saying terrible. \"We must have coffee sometime\" is generally not an invitation, and producing your diary at this point will cause mild alarm. Meanwhile, \"sorry\" can mean almost anything, including \"you have just stepped on my foot and I hold you personally responsible\".\n\nThe good news is that you do not need to master the whole system to take part. Three topics will get you through most encounters: the weather, your journey and whatever you are both queuing for. Keep your answers short, return the question, and resist the urge to give a truthful account of how you are. \"Not too bad, thanks, you?\" is a complete and satisfying conversation. Once you can manage it without thinking, you will find, to your slight dismay, that you have started doing it to other people.","minutes":2,"source":"seed","title":"The Quiet Art of Small Talk","topic":"British life"},{"id":"technical-debt","added":1,"body":"Every software engineer has done it. The deadline is looming, the demo is tomorrow, and the neat solution would take three days, so you hard-code a value, copy a function and promise yourself you will come back later. Ward Cunningham's famous metaphor for this is technical debt: you borrow speed today, and you repay it with interest every time the messy code slows somebody down.\n\nThe metaphor is useful precisely because it removes the moral panic. Debt is not inherently bad. A start-up that ships a clumsy prototype and learns that nobody wants the product has made an excellent bargain, since the code will be thrown away before the bill arrives. Trouble begins when the debt is taken on unknowingly, or when nobody keeps track of what is owed.\n\nTeams usually discover the problem indirectly. Estimates grow, simple changes break distant features, and new colleagues take months to become productive. Eventually someone proposes a full rewrite, which sounds heroic and is almost always a mistake. Rewrites tend to underestimate how much hard-won knowledge is buried in the ugly code, and the business rarely agrees to halt development while the work is done.\n\nA more modest strategy has proved sturdier. Good teams set aside a fixed share of each sprint for repayment, write tests around the parts they are wary of touching, and follow the old rule of leaving each file a little cleaner than they found it. None of this will make headlines. Neither will it win any awards at the end-of-year party. But in the long run, it is the difference between a codebase that people enjoy working on and one they quietly update their CVs to escape.","minutes":2,"source":"seed","title":"Borrowing from Your Future Self","topic":"Software"},{"id":"three-oclock","added":1793953000000,"body":"If you want to understand England, skip the museums and spend a wet Saturday afternoon at a lower-league football ground. The stadiums of the Premier League may attract tourists from every continent, yet the real ritual happens further down the pyramid, where a few thousand people gather to watch a team that will probably lose.\n\nPart of the appeal is tradition. English broadcasters are still barred from showing live matches during a slot on Saturday afternoons, a rule designed to protect attendance at smaller clubs. As a result, three o'clock retains an almost religious status. Fans queue for a pie, complain about the manager and debate tactics with people they have known since childhood.\n\nIn York, City play at a modern community stadium which they share with the rugby league side, the Knights, and supporters take a stubborn pride in their club however the season is going. Newcomers are usually welcomed, provided they don't claim to support someone famous instead.\n\nGoing along is an excellent way of improving your English. You will pick up slang, hear regional accents at full volume and discover that optimism is a form of madness. Above all, you will learn the most English lesson of all: that losing, if done together, is strangely comforting.","minutes":1,"source":"seed","title":"Saturday, Three O'Clock","topic":"Deportes"},{"id":"york-walls","added":1,"body":"Most visitors arrive in York expecting a museum, and for the first hour it is easy to see why. The Minster towers over the rooftops, the medieval walls encircle the old centre, and every second doorway seems to promise a ghost tour. Yet to treat the city as a preservation exercise alone would be to miss what makes it remarkable: York has been reinventing itself for nearly two thousand years.\n\nThe Romans founded it as Eboracum in AD 71, largely because the rivers Ouse and Foss made it easy to supply. The Vikings, who took the settlement in 866, renamed it Jorvik and turned it into a busy trading port, and their influence survives in street names ending in \"-gate\", from the Old Norse word for a street. Centuries later, George Hudson, a draper with boundless ambition, helped to make the city a hub of the railway age, while the Rowntree and Terry families built chocolate empires that employed thousands of local people.\n\nToday the economy leans heavily on universities, science and tourism, and the visitor who wanders into one of the narrow alleys known as snickelways may emerge beside a software company or a vegan café. The word itself is surprisingly recent: it was coined in the 1980s by a local author who walked and mapped these passages. That is rather typical of York. What looks timeless has often been invented by somebody with an eye for an opportunity, and nothing here has ever been truly finished.\n\nFor a newcomer, the lesson is reassuring. A city that has absorbed Romans, Vikings, railway speculators and generations of students will find room for one more stranger. You simply have to step off the main street and see where the alley leads.","minutes":2,"source":"seed","title":"The City Behind the Walls","topic":"York"}],"stats":{"best":{"match":29,"sprint":6},"days":{"2026-11-06":25},"done":{},"lastAuto":"2026-11-06"}}</script>
+<script>
+'use strict';
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0;[a[i], a[j]] = [a[j], a[i]] } return a };
+const pick = a => a[Math.random() * a.length | 0];
+const DAY = 864e5, INTERVALS = [1, 3, 7, 16, 35], MASTERED = 4;
+const dayKey = (t = Date.now()) => new Date(t).toLocaleDateString('en-CA');
+const norm = s => String(s).toLowerCase().replace(/[’‘]/g, "'").replace(/\s+/g, ' ').trim();
+const newId = p => p + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const list = s => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
+
+/* ---------- storage: everything lives in this browser ---------- */
+const LS = {
+  get(k, d) { try { return JSON.parse(localStorage.getItem('snw_' + k)) ?? d } catch { return d } },
+  set(k, v) { try { localStorage.setItem('snw_' + k, JSON.stringify(v)) } catch { toast('No queda espacio en este navegador. Borra algunos artículos.') } }
+};
+const S = { words: [], articles: [], pool: [], stats: { days: {}, best: {}, done: {} }, ready: false };
+function put(col, doc) {
+  if (S[col].some(x => x.id === doc.id)) S[col] = S[col].map(x => x.id === doc.id ? doc : x); else S[col] = [...S[col], doc];
+  LS.set(col, S[col]);
+}
+function remove(col, id) { S[col] = S[col].filter(x => x.id !== id); LS.set(col, S[col]) }
+function saveStats() { LS.set('stats', S.stats) }
+function touch(n = 1) { const k = dayKey(); S.stats.days = { ...S.stats.days, [k]: (S.stats.days[k] || 0) + n } }
+function streak() {
+  let n = 0, t = Date.now();
+  if (!S.stats.days[dayKey(t)]) t -= DAY;
+  while (S.stats.days[dayKey(t)]) { n++; t -= DAY }
+  return n;
+}
+function boot() {
+  if (!LS.get('started', false)) {
+    const seed = JSON.parse($('#seed').textContent);
+    ['words', 'articles', 'pool'].forEach(c => LS.set(c, seed[c])); LS.set('stats', seed.stats); LS.set('started', true);
+  }
+  S.words = LS.get('words', []); S.articles = LS.get('articles', []); S.pool = LS.get('pool', []);
+  S.stats = { days: {}, best: {}, done: {}, ...LS.get('stats', {}) };
+  S.ready = true; render(); if (ui.tab === 'reading') dailyArticle();
+}
+
+/* ---------- views ---------- */
+const ui = { tab: 'today', view: null, busy: false, stop: null, q: '', filter: 'all', src: LS.get('src', 'new'), cat: LS.get('cat', 'all'), deck: null, autoArticle: false, tmp: null };
+const VIEWS = {};
+function open(view, busy = false) { ui.stop?.(); ui.stop = null; ui.view = view; ui.busy = busy; render(); scrollTo(0, 0) }
+function refresh() { if (!ui.busy) render() }
+function render() {
+  $$('#tabs button').forEach(b => b.dataset.v === ui.tab ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
+  $('#main').innerHTML = ui.view ? ui.view() : VIEWS[ui.tab]();
+  if (ui.view?.after) ui.view.after();
+}
+function goTab(t) { ui.stop?.(); ui.stop = null; ui.tab = t; ui.view = null; ui.busy = false; render(); scrollTo(0, 0); if (t === 'reading') dailyArticle() }
+function toast(m) { const t = $('#toast'); t.textContent = m; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2600) }
+function sheet(html) { const s = $('#sheet'); s.innerHTML = `<div role="dialog" aria-modal="true">${html}</div>`; s.hidden = false }
+function closeSheet() { $('#sheet').hidden = true; $('#sheet').innerHTML = '' }
+const enVoices = () => { try { return speechSynthesis.getVoices().filter(v => /^en[-_]/i.test(v.lang)) } catch { return [] } };
+const voiceScore = v => (/^en[-_]GB/i.test(v.lang) ? 100 : 0) + (/natural|neural|online|premium|enhanced/i.test(v.name) ? 20 : 0) + (/google/i.test(v.name) ? 10 : 0) + (/sonia|libby|ryan|maisie|thomas|daniel|kate|serena/i.test(v.name) ? 5 : 0);
+function bestVoice() { const vs = enVoices(), saved = LS.get('voice', ''); return vs.find(v => v.name === saved) || [...vs].sort((x, y) => voiceScore(y) - voiceScore(x))[0] || null }
+function speak(t, rate = .95) {
+  try {
+    const say = () => {
+      const v = bestVoice(); if (!v) { toast('Este dispositivo no tiene voz en inglés.'); return }
+      const u = new SpeechSynthesisUtterance(t.replace(/\(.*?\)/g, '')); u.voice = v; u.lang = v.lang; u.rate = rate;
+      speechSynthesis.cancel(); setTimeout(() => speechSynthesis.speak(u), 60);
+    };
+    if (enVoices().length) say(); else { speechSynthesis.addEventListener('voiceschanged', say, { once: true }); speechSynthesis.getVoices(); setTimeout(() => { if (!enVoices().length) toast('Este dispositivo no tiene voz en inglés.') }, 1200) }
+  } catch { toast('El audio no está disponible aquí.') }
+}
+function playWord(term) { const w = [...S.words, ...S.pool, ui.tmp].find(x => x && x.term === term); if (w?.audio) { new Audio(w.audio).play().catch(() => speak(term)) } else speak(term) }
+const voiceBar = term => {
+  const gb = enVoices().filter(v => /^en[-_]GB/i.test(v.lang)), opts = gb.length ? gb : enVoices(), cur = bestVoice();
+  return `<div class="row"><button class="btn" data-a="play" data-v="${esc(term)}">Escuchar</button><button class="btn" data-a="speak" data-r=".65" data-v="${esc(term)}">Lento</button>${opts.length > 1 ? `<select class="f grow" id="voice" aria-label="Voz">${opts.map(v => `<option${v === cur ? ' selected' : ''}>${esc(v.name)}</option>`).join('')}</select>` : ''}</div>`;
+};
+const isDue = w => (w.due || 0) <= Date.now();
+const notice = () => '';
+
+/* the Minster's rose window: each ring is a Leitner box, and it lights up as words climb */
+function rose() {
+  const cx = 110, cy = 110, rings = [[20, 40, 8], [42, 60, 16], [62, 78, 16], [80, 94, 32], [96, 108, 32]];
+  const cols = ['var(--ruby)', 'var(--glass)', 'var(--amber)', 'var(--leaf)'];
+  const total = S.words.length || 1;
+  const pt = (r, a) => `${(cx + r * Math.cos(a)).toFixed(2)} ${(cy + r * Math.sin(a)).toFixed(2)}`;
+  let out = '';
+  rings.forEach(([r0, r1, n], ring) => {
+    const lit = Math.round(n * S.words.filter(w => (w.box || 0) > ring).length / total);
+    for (let i = 0; i < n; i++) {
+      const a0 = i / n * 2 * Math.PI - Math.PI / 2 + .012, a1 = (i + 1) / n * 2 * Math.PI - Math.PI / 2 - .012;
+      out += `<path d="M${pt(r0, a0)} A${r0} ${r0} 0 0 1 ${pt(r0, a1)} L${pt(r1, a1)} A${r1} ${r1} 0 0 0 ${pt(r1, a0)}Z" fill="${i < lit ? cols[(i + ring) % 4] : 'var(--unlit)'}"/>`;
+    }
+  });
+  return `<svg class="rose" viewBox="0 0 220 220" role="img" aria-label="Rosetón de progreso: cada anillo se ilumina según suben tus palabras de nivel">${out}<circle cx="110" cy="110" r="17" fill="var(--amber)"/></svg>`;
+}
+VIEWS.today = () => {
+  if (!S.ready) return `<p class="muted">Cargando tu vocabulario…</p>`;
+  const due = S.words.filter(isDue);
+  const next = [...S.articles].sort((x, y) => (y.added || 0) - (x.added || 0)).find(a => !Object.keys(S.stats.done || {}).some(k => k.startsWith(a.id + ':'))) || S.articles[0];
+  const todayN = Math.floor(Date.now() / DAY), fresh = k => S.pool.filter(w => w.kind === k && !w.played);
+  const dayPick = a => a.length ? a[todayN % a.length] : null;
+  const ex = dayPick(fresh('expression')), nw = dayPick(fresh('word'));
+  const newCard = (label, w) => w ? `<section class="panel"><span class="eyebrow">${label}</span><h3>${esc(w.term)}</h3><p class="small">${esc(w.es)}</p><p class="small muted">${esc(w.example)}</p><div class="row"><button class="btn" data-a="word" data-v="${esc(w.id)}">Ver</button><button class="btn" data-a="keep" data-v="${esc(w.id)}">Guardar</button></div></section>` : '';
+  return `<div class="stack">
+  <section class="hero panel">
+    ${rose()}
+    <div class="stack">
+      <div><h1>Tu camino hacia el C1</h1><p class="muted">Cada palabra que dominas ilumina un cristal del rosetón.</p></div>
+      <div class="stats">
+        <div><b>${S.words.length}</b><span>guardadas</span></div>
+        <div><b>${S.words.filter(w => (w.box || 0) >= MASTERED).length}</b><span>dominadas</span></div>
+        <div><b>${streak()}</b><span>días seguidos</span></div>
+      </div>
+    </div>
+  </section>
+  ${notice()}
+  ${!S.words.length ? `<section class="panel"><h2>Aún no hay palabras</h2><p>Guarda la primera palabra y aparecerá aquí tu repaso del día.</p><div><button class="btn main" data-a="newWord">Añadir palabra</button></div></section>` : `
+  <section class="panel">
+    <span class="eyebrow">Repaso de hoy</span>
+    <h2>${due.length ? `${Math.min(due.length, 20)} ${due.length === 1 ? 'palabra toca' : 'palabras tocan'} ahora` : 'Repaso al día'}</h2>
+    ${due.length > 20 ? `<p class="small muted">Quedan ${due.length} pendientes en total. Van de 20 en 20.</p>` : ''}
+    <div class="row">${due.length ? `<button class="btn main" data-a="review">Empezar repaso</button>` : `<button class="btn" data-a="tab" data-v="games">Jugar un rato</button>`}</div>
+  </section>`}
+  <div class="two">
+    ${next ? `<section class="panel"><span class="eyebrow">Para leer</span><h3>${esc(next.title)}</h3><p class="small muted">${esc(next.topic)} · ${esc(next.minutes)} min</p><div><button class="btn" data-a="art" data-v="${esc(next.id)}">Leer artículo</button></div></section>` : ''}
+    ${newCard('Expresión de hoy', ex)}${newCard('Palabra de hoy', nw)}
+  </div>
+  ${geminiPanel()}
+  <section class="panel"><span class="eyebrow">Copia de seguridad</span><p class="small muted">Tu progreso se guarda en este navegador. Descarga una copia de vez en cuando, y úsala para pasar tus datos a otro dispositivo.</p><div class="row"><button class="btn" data-a="backup">Descargar copia</button><label class="btn" for="restore">Restaurar copia</label><input id="restore" type="file" accept=".json" hidden></div></section>
+</div>`};
+
+/* ---------- vocabulary ---------- */
+const pips = w => `<span class="pips" title="Nivel ${w.box || 0} de 5">${[1, 2, 3, 4, 5].map(i => `<i class="${(w.box || 0) >= i ? 'on' : ''}"></i>`).join('')}</span>`;
+function wordRows() {
+  const q = norm(ui.q);
+  const rows = (ui.filter === 'discover' ? S.pool : S.words).filter(w => (ui.filter === 'all' || ui.filter === 'discover' || (ui.filter === 'due' ? isDue(w) : w.kind === ui.filter))
+    && (!q || norm([w.term, w.es, w.meaning, ...(w.synonyms || []), ...(w.antonyms || [])].join(' ')).includes(q)))
+    .sort((a, b) => (b.added || 0) - (a.added || 0) || a.term.localeCompare(b.term));
+  if (!rows.length) return `<p class="muted">${S.ready ? 'Nada por aquí. Prueba otro filtro o añade una entrada.' : 'Cargando…'}</p>`;
+  return `<div class="list">${rows.map(w => `<button class="item" data-a="word" data-v="${esc(w.id)}"><span><span class="term">${esc(w.term)}</span><br><span class="small muted">${esc(w.es || w.meaning)}</span></span>${ui.filter === 'discover' ? `<span class="small muted" style="flex:none">${esc(CATS[w.cat] || '')}</span>` : pips(w)}</button>`).join('')}</div>`;
+}
+VIEWS.words = () => `<div class="stack">
+  <div class="row between"><h1>Vocabulario</h1><div class="row"><button class="btn" data-a="suggest">Traer nuevas</button><button class="btn main" data-a="newWord">Añadir</button></div></div>
+  <input class="f" id="search" type="search" placeholder="Busca en inglés o español" aria-label="Buscar" value="${esc(ui.q)}">
+  <div class="chips">${[['all', 'Todas'], ['word', 'Palabras'], ['expression', 'Expresiones'], ['due', 'Por repasar'], ['discover', 'Descubrir']].map(([k, l]) => `<button class="chip" aria-pressed="${ui.filter === k}" data-a="filter" data-v="${k}">${l}</button>`).join('')}</div>
+  <div id="rows">${wordRows()}</div>
+</div>`;
+const relTag = (cls, label, a) => a?.length ? `<p class="tag ${cls}"><b>${label}:</b> ${a.map(esc).join(', ')}</p>` : '';
+const rels = w => w.kind === 'expression' ? relTag('syn', 'También se dice', w.synonyms) : relTag('syn', 'Sinónimos', w.synonyms) + relTag('ant', 'Antónimos', w.antonyms);
+const ipaTag = w => w.ipa ? `<span class="ipa">${esc(w.ipa)}</span>` : '';
+function entrySheet(w, foot) {
+  sheet(`<div><h2>${esc(w.term)}</h2><p class="small muted">${ipaTag(w)} ${esc(w.pos === 'expression' ? '' : w.pos || '')}${w.topic ? ' · ' + esc(w.topic) : ''}</p></div>
+  ${voiceBar(w.term)}
+  <p>${esc(w.meaning)}</p><p class="muted">${esc(w.es)}</p>
+  ${w.note ? `<p class="small"><b>Cuándo usarla:</b> ${esc(w.note)}</p>` : ''}
+  ${rels(w)}
+  ${w.example ? `<p style="font-family:var(--read)"><i>${esc(w.example)}</i></p>` : ''}
+  ${foot}`);
+}
+function showWord(id) {
+  const saved = S.words.find(x => x.id === id), w = saved || S.pool.find(x => x.id === id); if (!w) return;
+  entrySheet(w, saved ? `<div class="row">${pips(w)}<span class="small muted">${isDue(w) ? 'Toca repasar' : 'Próximo repaso: ' + new Date(w.due).toLocaleDateString('es-ES')}</span></div>
+  <div class="row"><button class="btn" data-a="edit" data-v="${esc(w.id)}">Editar</button><button class="btn bad" data-a="delAsk" data-v="${esc(w.id)}">Borrar</button><span class="grow"></span><button class="btn" data-a="close">Cerrar</button></div>`
+    : `<div class="row"><button class="btn main" data-a="keep" data-v="${esc(w.id)}">Guardar en mi vocabulario</button><button class="btn" data-a="close">Cerrar</button></div>`);
+}
+let lookupN = 0;
+async function lookup(raw, sentence) {
+  const found = [...S.words, ...S.pool].find(w => stems(raw).includes(norm(w.term)));
+  if (found) return showWord(found.id);
+  const n = ++lookupN;
+  sheet(`<h2>${esc(raw)}</h2><p class="muted">Buscando en el diccionario…</p>`);
+  let e = null, failed = false;
+  try { e = await dictEntry(raw, sentence) } catch { failed = true }
+  if (n !== lookupN || $('#sheet').hidden) return;
+  if (!e?.meaning) {
+    ui.tmp = { term: norm(raw), example: sentence };
+    return sheet(`<h2>${esc(raw)}</h2><p>${failed ? NET_ERR : 'No aparece en el diccionario. Puede ser un nombre propio o una forma poco común.'}</p><div class="row"><button class="btn" data-a="tmpForm">Añadir a mano</button><button class="btn" data-a="close">Cerrar</button></div>`);
+  }
+  if (!e.example) e.example = sentence;
+  ui.tmp = e;
+  entrySheet(e, `<div class="row"><button class="btn main" data-a="tmpKeep">Guardar en mi vocabulario</button><button class="btn" data-a="close">Cerrar</button></div>`);
+}
+function syncKind() { const expr = $('#f-kind')?.value === 'expression'; const a = $('#l-ant'), n = $('#l-note'), t = $('#l-syn-t'); if (!a) return; a.hidden = expr; n.hidden = !expr; t.textContent = expr ? 'Otras formas de decirlo, separadas por comas' : 'Sinónimos, separados por comas' }
+function wordForm(w = {}) {
+  sheet(`<form id="wf" class="stack" data-id="${esc(w.id || '')}">
+  <h2>${w.id ? 'Editar entrada' : 'Nueva entrada'}</h2>
+  <label class="l">Palabra o expresión<input class="f" id="f-term" required value="${esc(w.term)}" autocomplete="off" autocapitalize="off"></label>
+  <div class="row"><button type="button" class="btn" data-a="fill">Buscar en el diccionario</button></div>
+  <div class="two"><label class="l">Tipo<select class="f" id="f-kind"><option value="word">Palabra</option><option value="expression"${w.kind === 'expression' ? ' selected' : ''}>Expresión</option></select></label>
+  <label class="l">Categoría gramatical<input class="f" id="f-pos" value="${esc(w.pos)}" placeholder="adj, verb, noun…"></label></div>
+  <label class="l">Fonética<input class="f" id="f-ipa" value="${esc(w.ipa)}" placeholder="/wɜːd/"></label>
+  <label class="l">Significado en inglés<textarea class="f" id="f-meaning" rows="2" required>${esc(w.meaning)}</textarea></label>
+  <label class="l">En español<input class="f" id="f-es" value="${esc(w.es)}"></label>
+  <label class="l"><span id="l-syn-t">Sinónimos, separados por comas</span><input class="f" id="f-syn" value="${esc((w.synonyms || []).join(', '))}"></label>
+  <label class="l" id="l-ant">Antónimos, separados por comas<input class="f" id="f-ant" value="${esc((w.antonyms || []).join(', '))}"></label>
+  <label class="l" id="l-note" hidden>Cuándo usarla<input class="f" id="f-note" value="${esc(w.note)}"></label>
+  <label class="l">Ejemplo<textarea class="f" id="f-ex" rows="2">${esc(w.example)}</textarea></label>
+  <input type="hidden" id="f-ctx" value="${esc(w.context)}">
+  <div class="row"><button class="btn main" type="submit">Guardar</button><button class="btn" type="button" data-a="close">Cancelar</button></div>
+</form>`);
+  syncKind();
+}
+function saveWord(f) {
+  const id = f.dataset.id, old = S.words.find(x => x.id === id) || {}, term = $('#f-term').value.trim();
+  if (!id && S.words.some(w => norm(w.term) === norm(term))) { toast('Esa entrada ya está guardada.'); return }
+  const kind = $('#f-kind').value;
+  const d = { ...old, id: id || newId(kind === 'expression' ? 'e' : 'w'), term, kind, pos: $('#f-pos').value.trim(), ipa: $('#f-ipa').value.trim(), audio: old.audio || '', note: $('#f-note').value.trim(), meaning: $('#f-meaning').value.trim(), es: $('#f-es').value.trim(),
+    synonyms: list($('#f-syn').value), antonyms: kind === 'word' ? list($('#f-ant').value) : [], example: $('#f-ex').value.trim(), box: old.box || 0, due: old.due || 0, added: old.added || Date.now() };
+  put('words', d); touch(); saveStats(); closeSheet(); toast('Guardado'); refresh();
+}
+
+/* ---------- review (spaced repetition) ---------- */
+function startReview() {
+  const queue = shuffle(S.words.filter(isDue)).slice(0, 20), total = queue.length; let flipped = false;
+  const view = () => {
+    const w = queue[0];
+    if (!w) return `<div class="card"><div class="big">Repaso hecho</div><p class="muted">${total} ${total === 1 ? 'palabra repasada' : 'palabras repasadas'}. Mañana volverán las que toquen.</p><div><button class="btn main" data-a="tab" data-v="today">Volver a Hoy</button></div></div>`;
+    return `<div class="stack"><div class="row between"><span class="small muted">${total - queue.length + 1} de ${total}</span><button class="link" data-a="tab" data-v="today">Salir</button></div>
+    <div class="bar"><i style="width:${(total - queue.length) / total * 100}%"></i></div>
+    <div class="card"><div class="big">${esc(w.term)}</div>
+    <div class="small muted">${ipaTag(w)}</div>
+    <div class="row" style="justify-content:center"><button class="link" data-a="play" data-v="${esc(w.term)}">Escuchar</button><button class="link" data-a="speak" data-r=".65" data-v="${esc(w.term)}">Lento</button></div>
+    ${flipped ? `<p>${esc(w.meaning)}</p><p class="muted">${esc(w.es)}</p>${w.note ? `<p class="small">${esc(w.note)}</p>` : ''}${rels(w)}${w.example ? `<p style="font-family:var(--read)"><i>${esc(w.example)}</i></p>` : ''}` : ''}</div>
+    ${flipped ? `<div class="choices"><button data-a="rate" data-v="0">No la sabía</button><button data-a="rate" data-v="1">Casi</button><button data-a="rate" data-v="2">La sabía</button></div>`
+        : `<button class="btn main" data-a="flip">Ver respuesta</button>`}</div>`;
+  };
+  A.flip = () => { flipped = true; render() };
+  A.rate = el => {
+    const w = queue.shift(), r = +el.dataset.v;
+    const box = r === 2 ? Math.min(5, (w.box || 0) + 1) : r === 1 ? Math.max(1, w.box || 1) : 1;
+    if (r === 0) queue.push({ ...w, box });
+    put('words', { ...w, box, due: Date.now() + (r === 0 ? 0 : INTERVALS[box - 1] * DAY) });
+    touch(); saveStats(); flipped = false;
+    render();
+  };
+  open(view, true);
+}
+
+/* ---------- reading generator: builds a fresh exercise from any article's text ---------- */
+const READING = { mc: 'Elige la palabra', open: 'Rellena los huecos', wf: 'Transforma la palabra', gapped: 'Frases perdidas' };
+const READING_HELP = { mc: 'Vocabulario y colocaciones', open: 'Gramática: preposiciones, conectores, auxiliares', wf: 'Familias de palabras', gapped: 'Coloca cada frase en su sitio' };
+const sentencesOf = p => p.match(/[^.!?]+[.!?]+["”')]*\s*|[^.!?]+$/g) || [p];
+function wordsIn(text) { const out = [], re = /[A-Za-z][A-Za-z’'-]*/g; let m; while ((m = re.exec(text))) out.push({ w: m[0], i: m.index }); return out }
+const inQuotes = (text, i) => (text.slice(0, i).match(/["“”]/g) || []).length % 2 === 1;
+
+const GR = {};
+const addGr = (cat, tip, ws) => ws.split(' ').forEach(w => GR[w] = { cat, tip });
+addGr('Preposición', 'Fíjate en la palabra que la rige.', 'in on at by for with from of about into through over under between against without during');
+addGr('Relativo', 'Se refiere a algo que ya se ha dicho.', 'which who whose where');
+addGr('Conector', 'Mira qué relación hay entre las dos ideas.', 'although though while whereas because since unless until however yet but if than whether despite');
+addGr('Auxiliar', 'Mira el sujeto y el tiempo verbal.', 'is are was were been being have has had do does did');
+addGr('Modal', 'Expresa posibilidad, obligación o futuro.', 'will would can could may might must should');
+addGr('Determinante o pronombre', 'Mira a qué sustantivo acompaña o sustituye.', 'it there their its this these those such most much many few little more own every each any some all other');
+const ALT = [['which', 'that'], ['who', 'that'], ['although', 'though'], ['while', 'whereas'], ['because', 'since'], ['can', 'may', 'might', 'could'], ['but', 'yet']];
+
+// irregular word families; everything else is handled by the suffix rules in derive()
+const FAM = Object.fromEntries(`decision:decide decisive:decide assumption:assume knowledge:know strength:strong length:long width:wide depth:deep height:high growth:grow death:die belief:believe proof:prove choice:choose speech:speak failure:fail pressure:press pleasure:please arrival:arrive approval:approve survival:survive refusal:refuse success:succeed successful:succeed important:importance performance:perform appearance:appear difference:differ different:differ existence:exist preference:prefer reference:refer dependent:depend independent:depend confidence:confident education:educate educational:educate information:inform communication:communicate production:produce productive:produce creative:create creation:create competition:compete competitive:compete discussion:discuss explanation:explain description:describe solution:solve reduction:reduce introduction:introduce attention:attend intention:intend possibility:possible responsibility:responsible reality:real security:secure activity:act active:act national:nation natural:nature personal:person professional:profession traditional:tradition cultural:culture industrial:industry financial:finance economic:economy historic:history historical:history scientific:science scientist:science player:play developer:develop engineer:engine supporter:support analyst:analyse analysis:analyse critical:criticise curious:curiosity famous:fame dangerous:danger various:vary variety:vary mysterious:mystery impressive:impress expensive:expense attractive:attract effective:effect expectation:expect reluctance:reluctant hindrance:hinder reliable:rely acceptable:accept boundless:bound evidence:evident preservation:preserve generation:generate organisation:organise conversation:converse invitation:invite recommendation:recommend transformation:transform requirement:require weight:weigh sight:see flight:fly loss:lose sale:sell gift:give laughter:laugh poverty:poor wealthy:wealth healthy:health freedom:free friendship:friend leadership:lead membership:member relationship:relate childhood:child neighbourhood:neighbour simply:simple gently:gentle subtly:subtle wholly:whole truly:true fully:full unhelpful:help powerful:power peaceful:peace comfortable:comfort understandable:understand unknown:know`.split(/\s+/).map(p => p.split(':')));
+const NO_LY = new Set('only early family likely unlikely apply reply supply rely fly daily ally lovely friendly ugly holy july italy assembly anomaly elderly costly lonely deadly monopoly nearly hardly lately shortly curly hourly weekly monthly yearly lively orderly scholarly imply multiply comply'.split(' '));
+const ICAL = /^(critical|logical|practical|typical|physical|political|technical|musical|historical|medical|magical|radical|vertical|ethical|tactical|economical)ly$/;
+const NO_NESS = new Set('business witness harness'.split(' '));
+const NO_MENT = new Set('comment moment document segment element apartment department implement compliment instrument environment experiment fragment garment cement pigment ornament tournament parliament supplement sentiment regiment torment basement argument government'.split(' '));
+const NO_LESS = new Set('unless nevertheless regardless nonetheless'.split(' '));
+const NO_FUL = new Set('awful handful mouthful spoonful armful'.split(' '));
+function derive(w) {
+  if (w.length < 6 || w !== w.toLowerCase() || !/^[a-z]+$/.test(w)) return null;
+  if (FAM[w]) return { base: FAM[w], why: 'Pertenece a la familia de esta palabra.' };
+  const adv = 'Adverbio formado a partir del adjetivo.';
+  if (w.endsWith('ly') && !NO_LY.has(w) && !/[^a]lly$/.test(w)) {
+    if (w.endsWith('ily')) return { base: w.slice(0, -3) + 'y', why: adv + ' La -y pasa a -ily.' };
+    if (/[ai]bly$/.test(w)) return { base: w.slice(0, -1) + 'e', why: adv + ' La -e cae y queda -ly.' };
+    if (ICAL.test(w)) return { base: w.slice(0, -2), why: adv };
+    if (w.endsWith('ically')) return { base: w.slice(0, -4), why: adv + ' Los adjetivos en -ic hacen -ically.' };
+    return { base: w.slice(0, -2), why: adv };
+  }
+  if (w.endsWith('iness') && !NO_NESS.has(w)) return { base: w.slice(0, -5) + 'y', why: 'Sustantivo abstracto: la -y pasa a -iness.' };
+  if (w.endsWith('ness') && !NO_NESS.has(w)) return { base: w.slice(0, -4), why: 'Sustantivo abstracto con -ness.' };
+  if (w.endsWith('ment') && !NO_MENT.has(w)) return { base: w.slice(0, -4), why: 'Sustantivo formado con -ment.' };
+  if (w.endsWith('less') && !NO_LESS.has(w)) return { base: w.slice(0, -4), why: 'Adjetivo con -less: "sin".' };
+  if (w.endsWith('iful')) return { base: w.slice(0, -4) + 'y', why: 'Adjetivo: la -y pasa a -iful.' };
+  if (w.endsWith('ful') && !NO_FUL.has(w)) return { base: w.slice(0, -3), why: 'Adjetivo con -ful.' };
+  return null;
+}
+const CONF = [['make', 'do', 'take', 'get'], ['made', 'did', 'took', 'got'], ['makes', 'does', 'takes', 'gets'], ['say', 'tell', 'speak', 'talk'], ['said', 'told', 'spoke', 'talked'], ['lose', 'miss', 'waste', 'drop'], ['raise', 'rise', 'lift', 'grow'], ['such', 'too', 'very', 'so'], ['however', 'therefore', 'moreover', 'otherwise'], ['because', 'although', 'unless', 'until'], ['in', 'on', 'at', 'by'], ['for', 'with', 'of', 'to'], ['from', 'of', 'by', 'with'], ['about', 'over', 'around', 'across']];
+const SUF = ['ically', 'ly', 'tion', 'sion', 'ment', 'ing', 'ous', 'ive', 'ity', 'ness', 'ful', 'able', 'ance', 'ence', 'ous'];
+const capLike = (o, w) => /^[A-Z]/.test(w) ? o[0].toUpperCase() + o.slice(1) : o;
+
+function cut(body, cands, n, spread = 55) {
+  const start = sentencesOf(body)[0].length, got = [];
+  const tokens = wordsIn(body).filter(x => x.i >= start && !inQuotes(body, x.i));
+  for (const [cand, limit] of cands) {
+    let used = 0;
+    for (const x of shuffle(tokens)) {
+      if (got.length >= n || used >= limit) break;
+      if (got.some(g => Math.abs(g.i - x.i) < spread)) continue;
+      const it = cand(x.w); if (it) { got.push({ ...x, it }); used++ }
+    }
+  }
+  got.sort((a, b) => a.i - b.i);
+  let text = '', pos = 0;
+  got.forEach((g, k) => { text += body.slice(pos, g.i) + `{${k + 1}}`; pos = g.i + g.w.length });
+  return { text: text + body.slice(pos), items: got.map(g => g.it) };
+}
+function makeReading(a, type) {
+  const body = a.body, base = { id: `${a.id}:${type}`, type, title: READING[type] };
+  if (type === 'open') {
+    const used = {};
+    const cand = w => {
+      const k = norm(w), g = GR[k]; if (!g || (used[g.cat] || 0) >= 3) return null;
+      used[g.cat] = (used[g.cat] || 0) + 1;
+      return { answer: k, accepted: ALT.filter(s => s.includes(k)).flat(), explanation: `${g.cat}. ${g.tip}` };
+    };
+    return { ...base, ...cut(body, [[cand, 8]], 8) };
+  }
+  if (type === 'wf') {
+    const seen = new Set();
+    const cand = w => {
+      const d = derive(w); if (!d || seen.has(w)) return null; seen.add(w);
+      return { answer: w, base: d.base.toUpperCase(), explanation: d.why };
+    };
+    return { ...base, ...cut(body, [[cand, 8]], 8) };
+  }
+  if (type === 'mc') {
+    const all = [...S.words, ...S.pool].filter(w => w.kind === 'word' && /^[a-z]+$/.test(w.term));
+    const bank = new Map(all.map(w => [w.term, w]));
+    const here = new Set(wordsIn(body).map(x => norm(x.w)));
+    const seen = new Set();
+    const elsewhere = [...new Set([...S.articles.filter(x => x.id !== a.id).flatMap(x => wordsIn(x.body).map(y => y.w)).filter(w => /^[a-z]+$/.test(w)), ...all.map(w => w.term)])].filter(w => !here.has(w) && w.length > 4);
+    const fromBank = w => {
+      const k = norm(w), e = bank.get(k); if (!e || seen.has(k)) return null;
+      const others = shuffle(all.filter(x => x.pos === e.pos && !here.has(x.term))).slice(0, 3).map(x => x.term);
+      if (others.length < 3) return null; seen.add(k);
+      return { answer: w, options: [k, ...others].map(o => capLike(o, w)).sort(), explanation: `${e.meaning} (${e.es})` };
+    };
+    const fromSuffix = w => {
+      const k = norm(w); if (w !== k || k.length < 6 || GR[k] || seen.has(k)) return null;
+      const s = SUF.find(x => k.endsWith(x)); if (!s) return null;
+      const others = shuffle(elsewhere.filter(x => x.endsWith(s))).slice(0, 3);
+      if (others.length < 3) return null; seen.add(k);
+      return { answer: w, options: [k, ...others].sort(), explanation: 'Es la palabra del artículo original; las otras no encajan con el sentido de la frase.' };
+    };
+    const fromConf = w => {
+      const k = norm(w), set = CONF.find(s => s.includes(k)); if (!set || seen.has(k)) return null; seen.add(k);
+      return { answer: w, options: set.map(o => capLike(o, w)).sort(), explanation: 'Mira qué exige la frase: colocación o gramática.' };
+    };
+    return { ...base, ...cut(body, [[fromBank, 3], [fromSuffix, 5], [fromConf, 2]], 8) };
+  }
+  // gapped text: take one sentence out of several paragraphs, add one from another article
+  const ps = paras(body).map(p => sentencesOf(p));
+  const picks = shuffle(ps.map((s, i) => i).filter(i => ps[i].length >= 2)).slice(0, 5).sort((x, y) => x - y);
+  const removed = picks.map(i => { const j = 1 + (Math.random() * (ps[i].length - 1) | 0); const s = ps[i][j]; ps[i] = ps[i].map((t, k) => k === j ? '\u0000' : t); return s.trim() });
+  const other = shuffle(S.articles.filter(x => x.id !== a.id)).flatMap(x => paras(x.body).flatMap(p => sentencesOf(p).slice(1))).map(s => s.trim()).find(s => s.length > 40);
+  const opts = shuffle(other ? [...removed, other] : removed), L = 'ABCDEFGH';
+  const letters = opts.map((s, i) => ({ l: L[i], s }));
+  let k = 0;
+  const text = ps.map(p => p.join('').replace('\u0000', () => `{${++k}} `)).join('\n\n');
+  const items = removed.map(s => { const o = letters.find(x => x.s === s); return { answer: o.l, options: letters.map(x => x.l), explanation: s } });
+  return { ...base, text, items, letters };
+}
+
+/* ---------- reading ---------- */
+const newestFirst = a => [...a].sort((x, y) => (y.added || 0) - (x.added || 0));
+const ACATS = ['it', 'sport', 'england', 'uni'];
+VIEWS.reading = () => `<div class="stack">
+  <h1>Lecturas</h1>${notice()}
+  ${ui.autoArticle ? `<p class="small muted">Buscando el artículo de hoy…</p>` : ''}
+  <section class="panel"><h3>Sorpréndeme con un artículo</h3>
+    <div class="chips">${ACATS.map(c => `<button class="chip" data-a="surprise" data-v="${c}">${CATS[c]}</button>`).join('')}<button class="chip" data-a="surprise" data-v="all">Cualquiera</button></div>
+    <label class="l">O pide un tema<input class="f" id="topic" placeholder="Por ejemplo: York Minster, Premier League, Git"></label>
+    <div><button class="btn" data-a="newArticle">Buscar sobre este tema</button></div>
+    <p class="small muted">${hasKey() ? 'Gemini escribe los artículos nuevos para ti.' : 'Los artículos nuevos vienen de Wikipedia. Conecta Gemini en Hoy para que te los escriba a tu nivel.'}</p>
+  </section>
+  ${S.articles.length ? `<div class="list">${newestFirst(S.articles).map(a => {
+    const d = Object.keys(READING).filter(t => S.stats.done?.[`${a.id}:${t}`]).length;
+    return `<button class="item" data-a="art" data-v="${esc(a.id)}"><span><span class="term">${esc(a.title)}</span><br><span class="small muted">${esc(a.topic)} · ${esc(a.minutes)} min</span></span><span class="small muted" style="flex:none">${d}/4</span></button>`
+  }).join('')}</div>` : `<p class="muted">${S.ready ? 'Todavía no hay artículos.' : 'Cargando…'}</p>`}
+</div>`;
+const stems = w => { w = norm(w); return [w, w.replace(/'s$/, ''), w.replace(/s$/, ''), w.replace(/es$/, ''), w.replace(/ed$/, ''), w.replace(/d$/, ''), w.replace(/ing$/, ''), w.replace(/ing$/, 'e')] };
+function tappable(text) {
+  const saved = new Set(S.words.filter(w => w.kind === 'word').map(w => norm(w.term)));
+  return text.split(/([A-Za-z][A-Za-z'’-]*)/).map((t, i) => i % 2 ? `<span class="w${stems(t).some(s => saved.has(s)) ? ' saved' : ''}" data-a="tap">${esc(t)}</span>` : esc(t)).join('');
+}
+const paras = t => String(t).split(/\n\s*\n/).filter(p => p.trim());
+function showArticle(id) {
+  const view = () => {
+    const a = S.articles.find(x => x.id === id); if (!a) return `<p class="muted">Este artículo ya no existe.</p>`;
+    return `<div class="stack"><div><button class="link" data-a="tab" data-v="reading">← Lecturas</button></div>
+    <div><span class="eyebrow">${esc(a.topic)} · ${esc(a.minutes)} min</span><h1>${esc(a.title)}</h1></div>
+    <article class="article">${paras(a.body).map(p => `<p>${tappable(p)}</p>`).join('')}</article>
+    <p class="small muted">Toca cualquier palabra para verla o guardarla. Las que ya tienes llevan subrayado de puntos.</p>
+    <section class="stack"><div><h2>Readings</h2><p class="small muted">Se crean solos con este texto y cambian cada vez que entras.</p></div>
+      <div class="list">${Object.entries(READING).map(([t, n]) => {
+      const d = S.stats.done?.[`${a.id}:${t}`];
+      return `<button class="item" data-a="ex" data-v="${esc(a.id)}" data-e="${t}"><span><span class="term">${n}</span><br><span class="small muted">${READING_HELP[t]}</span></span><span class="small muted" style="flex:none">${d ? `Mejor: ${d.best}/${d.total}` : 'Sin hacer'}</span></button>`
+    }).join('')}</div>
+    </section>
+    ${a.url ? `<p class="small muted">Texto de <a href="${esc(a.url)}" target="_blank" rel="noopener">Wikipedia</a>, licencia CC BY-SA.</p>` : a.source === 'gemini' ? `<p class="small muted">Escrito por Gemini.</p>` : ''}
+    <div><button class="btn bad" data-a="delArtAsk" data-v="${esc(a.id)}">Borrar artículo</button></div></div>`;
+  };
+  open(view);
+}
+function showExercise(aid, type) {
+  const a = S.articles.find(x => x.id === aid); if (!a) return;
+  const e = makeReading(a, type);
+  if (e.items.length < 3) { toast('Este artículo no da para este reading. Prueba otro tipo.'); return }
+  let checked = false, score = 0;
+  const answers = {};
+  const isRight = (it, v) => [it.answer, ...(it.accepted || [])].some(x => norm(x) === norm(v));
+  const gap = (n, it) => {
+    const v = answers[n] ?? '', right = checked && isRight(it, v), cls = checked ? (right ? ' ok' : ' no') : '';
+    const fix = checked && !right ? `<span class="fix">${esc(it.answer)}</span>` : '';
+    if (it.options) return `<span class="num">${n}</span><select class="gap${cls}" id="g${n}" aria-label="Hueco ${n}"${checked ? ' disabled' : ''}><option value="">…</option>${it.options.map(o => `<option${o === v ? ' selected' : ''}>${esc(o)}</option>`).join('')}</select>${fix}`;
+    return `<span class="num">${n}</span><input class="gap${cls}" id="g${n}" aria-label="Hueco ${n}" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(v)}"${checked ? ' disabled' : ''}>${it.base ? `<span class="base">${esc(it.base)}</span>` : ''}${fix}`;
+  };
+  const view = () => {
+    const body = paras(e.text).map(p => `<p>${p.split(/(\{\d+\})/).map(t => { const m = t.match(/^\{(\d+)\}$/); return m && e.items[m[1] - 1] ? gap(+m[1], e.items[m[1] - 1]) : tappable(t) }).join('')}</p>`).join('');
+    return `<div class="stack"><div><button class="link" data-a="art" data-v="${esc(aid)}">← ${esc(a.title)}</button></div>
+      <div><span class="eyebrow">Reading</span><h1>${esc(e.title)}</h1><p class="small muted">${esc(READING_HELP[type])}. Toca cualquier palabra que no sepas para ver qué significa.</p></div>
+      ${e.letters ? `<ul class="notes panel">${e.letters.map(x => `<li><b>${x.l}.</b> ${tappable(x.s)}</li>`).join('')}</ul><p class="small muted">Sobra una frase.</p>` : ''}
+      <article class="article">${body}</article>
+      ${checked ? `<div class="panel"><h2>${score} de ${e.items.length}</h2><ul class="notes">${e.items.map((it, i) => `<li><b>${i + 1}. ${esc(it.answer)}</b> ${esc(it.explanation)}</li>`).join('')}</ul>
+        ${type === 'open' ? `<p class="small muted">En este tipo puede haber otra respuesta válida además de la original.</p>` : ''}
+        <div class="row"><button class="btn main" data-a="ex" data-v="${esc(aid)}" data-e="${type}">Otro diferente</button><button class="btn" data-a="art" data-v="${esc(aid)}">Volver al artículo</button></div></div>`
+        : `<div><button class="btn main" data-a="check">Corregir</button></div>`}</div>`;
+  };
+  A.check = () => {
+    e.items.forEach((it, i) => { answers[i + 1] = document.getElementById('g' + (i + 1))?.value ?? '' });
+    score = e.items.filter((it, i) => isRight(it, answers[i + 1])).length; checked = true;
+    const prev = S.stats.done?.[e.id];
+    S.stats.done = { ...S.stats.done, [e.id]: { best: Math.max(prev?.best || 0, score), total: e.items.length, at: Date.now() } };
+    touch(); saveStats(); render(); $('#main').lastElementChild?.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+  open(view, true);
+}
+
+/* ---------- open sources: dictionary, translation, Wiktionary, Wikipedia ---------- */
+const CATS = { all: 'Todo', it: 'Informática', sport: 'Deportes', england: 'Inglaterra', uni: 'Universidad', general: 'General' };
+const SEEDS = {
+  it: ['computer', 'software', 'programming', 'network', 'database', 'security', 'internet', 'algorithm', 'server', 'data'],
+  sport: ['football', 'rugby', 'cricket', 'tennis', 'athletics', 'training', 'competition', 'match', 'injury', 'stadium'],
+  england: ['britain', 'england', 'pub', 'train', 'rent', 'weather', 'shopping', 'tea', 'neighbour', 'council'],
+  uni: ['university', 'essay', 'research', 'lecture', 'exam', 'degree', 'student', 'library', 'academic'],
+  general: ['economy', 'politics', 'health', 'environment', 'work', 'society', 'emotion', 'money', 'media'],
+};
+const IDIOMS = {
+  england: 'incategory:"English idioms" incategory:"British English"', sport: 'incategory:"English idioms" incategory:"en:Sports"',
+  it: 'incategory:"English idioms" incategory:"en:Computing"', uni: 'incategory:"English idioms"', general: 'incategory:"English idioms"',
+};
+const WIKI_CATS = {
+  it: ['Software engineering', 'Computer security', 'History of computing', 'Artificial intelligence', 'Video game development', 'Internet culture', 'Programming paradigms'],
+  sport: ['History of association football', 'Sports science', 'Football culture', 'Olympic Games', 'Formula One', 'Rugby league', 'Cricket', 'Tennis'],
+  england: ['Culture of England', 'English cuisine', 'History of Yorkshire', 'British culture', 'Education in England', 'York'],
+  uni: ['Higher education in the United Kingdom', 'Study skills', 'Academic publishing', 'University of Oxford'],
+};
+const realCat = c => c === 'all' ? pick(Object.keys(SEEDS)) : c;
+async function getJSON(u) { const r = await fetch(u, { signal: AbortSignal.timeout(9000) }); if (!r.ok) throw { status: r.status }; return r.json() }
+const NET_ERR = 'Sin conexión, o el servicio no responde. Prueba otra vez en un rato.';
+const POS = { n: 'noun', v: 'verb', adj: 'adj', adv: 'adverb' };
+const cleanDef = s => String(s).replace(/^[a-z]+\t/, '').replace(/^\s*\([^)]*\)\s*/, '').trim();
+const knownTerm = t => [...S.words, ...S.pool].some(w => norm(w.term) === norm(t));
+const goodList = a => [...new Set(a)].filter(x => /^[a-z][a-z' -]+$/.test(x)).slice(0, 4);
+const esCache = new Map();
+async function translate(t) {
+  if (esCache.has(t)) return esCache.get(t);
+  try {
+    const j = await getJSON('https://api.mymemory.translated.net/get?langpair=en|es&q=' + encodeURIComponent(t));
+    if (j.quotaFinished) return '';
+    const key = norm(t), exact = (j.matches || []).filter(m => norm(m.segment || '') === key && m.translation && !/MYMEMORY|INVALID/i.test(m.translation));
+    const best = exact.sort((a, b) => (+b.match || 0) - (+a.match || 0) || (b['usage-count'] || 0) - (a['usage-count'] || 0))[0];
+    const out = String(best?.translation || j.responseData?.translatedText || '').replace(/[.;]+$/, '');
+    if (/MYMEMORY|INVALID/i.test(out) || norm(out) === key) return '';
+    const res = t.includes(' ') ? out : out.toLowerCase(); esCache.set(t, res); return res;
+  } catch { return '' }
+}
+function dictForms(raw) {
+  const w = norm(raw).replace(/'s$/, ''), f = [w, ...stems(w)];
+  if (w.endsWith('ies')) f.push(w.slice(0, -3) + 'y');
+  if (w.endsWith('ied')) f.push(w.slice(0, -3) + 'y');
+  if (/([b-df-hj-np-tv-z])\1(ing|ed)$/.test(w)) f.push(w.replace(/.(ing|ed)$/, ''));
+  return [...new Set(f)].filter(x => x.length > 1);
+}
+const museTag = (x, p) => (x.tags || []).find(t => t.startsWith(p))?.slice(p.length) || '';
+function museEntry(x) {
+  const ipa = museTag(x, 'ipa_pron:');
+  return { term: x.word, kind: 'word', pos: POS[(x.tags || []).find(t => POS[t])] || '', ipa: ipa ? '/' + ipa + '/' : '', audio: '', meaning: cleanDef(x.defs?.[0] || ''), es: '', synonyms: [], antonyms: [], note: '', example: '' };
+}
+async function museRelated(term) {
+  const [syn, ant] = await Promise.all(['rel_syn', 'rel_ant'].map(r => getJSON('https://api.datamuse.com/words?max=4&' + r + '=' + encodeURIComponent(term)).catch(() => [])));
+  return { synonyms: goodList(syn.map(x => x.word)), antonyms: goodList(ant.map(x => x.word)).slice(0, 3) };
+}
+async function freeDictionary(raw) {
+  for (const f of dictForms(raw)) {
+    try { const d = await getJSON('https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(f)); if (d?.[0]) return d }
+    catch (e) { if (e?.status !== 404) return null } // busy service: fall back to the next source
+  }
+  return null;
+}
+async function museLookup(raw) {
+  for (const f of dictForms(raw)) {
+    const r = await getJSON('https://api.datamuse.com/words?max=1&md=dpr&ipa=1&sp=' + encodeURIComponent(f));
+    if (r[0]?.word === f && r[0].defs?.length) return museEntry(r[0]);
+  }
+  return null;
+}
+async function dictEntry(raw) {
+  const data = await freeDictionary(raw);
+  let e;
+  if (data) {
+    const meanings = data.flatMap(d => d.meanings || []), phon = data.flatMap(d => d.phonetics || []);
+    const m = meanings[0], defs = meanings.flatMap(x => x.definitions || []), d = defs[0];
+    const gbAudio = phon.find(p => /-(uk|gb)\.mp3/.test(p.audio || ''));
+    e = { term: data[0].word, kind: 'word', pos: ({ noun: 'noun', verb: 'verb', adjective: 'adj', adverb: 'adverb' })[m?.partOfSpeech] || m?.partOfSpeech || '', ipa: gbAudio?.text || phon.find(p => p.text)?.text || data[0].phonetic || '', audio: gbAudio?.audio || '', meaning: cleanDef(d?.definition || ''), es: '', note: '', example: defs.find(x => x.example)?.example || '',
+      synonyms: goodList(meanings.flatMap(x => [...(x.synonyms || []), ...(x.definitions || []).flatMap(y => y.synonyms || [])])), antonyms: goodList(meanings.flatMap(x => [...(x.antonyms || []), ...(x.definitions || []).flatMap(y => y.antonyms || [])])).slice(0, 3) };
+  } else { e = await museLookup(raw); if (!e) return null }
+  const [es, rel] = await Promise.all([translate(e.term), e.synonyms.length ? null : museRelated(e.term)]);
+  return { ...e, es, ...(rel || {}) };
+}
+const htmlText = h => new DOMParser().parseFromString(String(h), 'text/html').body.textContent.replace(/\s+/g, ' ').trim();
+const BAD_USAGE = /obsolete|archaic|dated|vulgar|offensive|derogatory|slur|rare|dialect|nonstandard/i;
+const RUDE = /\b(piss|shit|fuck|arse|ass|cock|dick|wank|bollock|tits?|bugger|bloody|sex|sexual|penis|vagina|crap|bitch|bastard)\w*/i;
+const NOT_WORD = /^(the |a )?(capital|city|town|river|country|state|surname|given name|county|island)\b/i;
+async function idiomEntry(title) {
+  const j = await getJSON('https://en.wiktionary.org/api/rest_v1/page/definition/' + encodeURIComponent(title.replace(/ /g, '_')));
+  const items = (j.en || []).flatMap(x => x.definitions || []).filter(x => x.definition);
+  const it = items.find(x => !BAD_USAGE.test(htmlText(x.definition).slice(0, 80)));
+  if (!it) return null;
+  const meaning = cleanDef(htmlText(it.definition));
+  if (meaning.length < 8 || meaning.length > 120 || RUDE.test(meaning)) return null;
+  return { term: title, kind: 'expression', pos: 'expression', ipa: '', audio: '', meaning, es: await translate(meaning.replace(/^To /, 'to ')), synonyms: [], antonyms: [], note: '', example: htmlText(it.examples?.[0] || '') };
+}
+async function inBatches(list, size, fn) { const out = []; for (let i = 0; i < list.length; i += size) out.push(...await Promise.all(list.slice(i, i + size).map(x => fn(x).catch(() => null)))); return out.filter(Boolean) }
+async function newWords(c, n) {
+  const seed = pick(SEEDS[c]), [a, b] = await Promise.all(['rel_trg=' + seed, 'ml=' + seed].map(q => getJSON('https://api.datamuse.com/words?md=dpfr&ipa=1&max=200&' + q)));
+  const freq = x => +(museTag(x, 'f:') || 0);
+  const cand = shuffle([...a, ...b].filter(x => /^[a-z]{5,14}$/.test(x.word) && x.defs?.length && !x.tags?.includes('prop') && freq(x) > .6 && freq(x) < 30 && !knownTerm(x.word) && !x.word.endsWith('ing') && !NOT_WORD.test(cleanDef(x.defs[0]))));
+  const seen = new Set(), picked = cand.filter(x => !seen.has(x.word) && seen.add(x.word)).slice(0, n + 4);
+  const rows = await inBatches(picked, 5, async x => {
+    const [es, rel] = await Promise.all([translate(x.word), museRelated(x.word)]);
+    return { ...museEntry(x), es, ...rel };
+  });
+  return rows.filter(e => e.es && e.meaning).slice(0, n).map(e => ({ ...e, cat: c }));
+}
+async function newIdioms(c, n) {
+  const j = await getJSON('https://en.wiktionary.org/w/api.php?format=json&origin=*&action=query&list=search&srnamespace=0&srsort=random&srlimit=50&srsearch=' + encodeURIComponent(IDIOMS[c]));
+  const titles = (j.query?.search || []).map(s => s.title).filter(t => /^[a-z][a-z' -]+$/.test(t) && t.includes(' ') && t.split(' ').length <= 6 && !RUDE.test(t) && !knownTerm(t));
+  const out = [];
+  for (let i = 0; i < titles.length && out.length < n; i += 5) out.push(...(await inBatches(titles.slice(i, i + 5), 5, idiomEntry)).filter(e => e.es));
+  return out.slice(0, n).map(e => ({ ...e, cat: c }));
+}
+async function fetchPool(cat, kind, n) {
+  const c = realCat(cat);
+  const parts = kind === 'word' ? [newWords(c, n)] : kind === 'expression' ? [newIdioms(c, n)] : [newWords(c, Math.ceil(n / 2)), newIdioms(c, Math.ceil(n / 2))];
+  const rows = (await Promise.all(parts)).flat();
+  const add = rows.map(x => ({ ...x, id: newId('p') }));
+  S.pool = [...S.pool, ...add]; LS.set('pool', S.pool);
+  return add.length;
+}
+const NO_TITLE = /^(list|outline|index|timeline|bibliography|glossary|\d{4})\b|\(disambiguation\)/i;
+function articleBody(extract) {
+  const stop = /^(See also|References|Notes|External links|Further reading|Bibliography|Footnotes|Sources)\s*$/;
+  const paras2 = []; let words = 0;
+  for (const raw of extract.split(/\n+/)) {
+    const p = raw.trim().replace(/\s*\([^()]*[\/ˈ][^()]*\)/g, '').replace(/\s{2,}/g, ' ');
+    if (stop.test(p)) break;
+    if (p.length < 90 || !/[.!?]["”')]?$/.test(p)) continue;
+    paras2.push(p); words += p.split(/\s+/).length;
+    if (words > 380) break;
+  }
+  return paras2.join('\n\n');
+}
+async function writeArticle(topicOrCat, free) {
+  const WP = 'https://en.wikipedia.org/w/api.php?format=json&origin=*&action=query';
+  const c = free ? null : (topicOrCat === 'all' ? pick(Object.keys(WIKI_CATS)) : topicOrCat);
+  const queries = free ? [topicOrCat] : shuffle(WIKI_CATS[c]).slice(0, 3).map(x => `incategory:"${x}"`);
+  for (const q of queries) {
+    const j = await getJSON(`${WP}&list=search&srnamespace=0&srlimit=25&srprop=wordcount${free ? '' : '&srsort=random'}&srsearch=${encodeURIComponent(q)}`);
+    const ok = (j.query?.search || []).filter(s => s.wordcount >= 400 && !NO_TITLE.test(s.title) && !S.articles.some(a => a.title === s.title));
+    const hits = (free ? ok : shuffle(ok)).slice(0, 4);
+    for (const h of hits) {
+      const e = await getJSON(`${WP}&prop=extracts&explaintext=1&exsectionformat=plain&titles=${encodeURIComponent(h.title)}`);
+      const page = Object.values(e.query.pages)[0], body = articleBody(page.extract || '');
+      if (body.split(/\s+/).length < 150) continue;
+      const a = { id: newId('art'), title: h.title, topic: free ? topicOrCat : CATS[c], body, minutes: Math.max(1, Math.round(body.split(/\s+/).length / 180)), source: 'wikipedia', url: 'https://en.wikipedia.org/wiki/' + encodeURIComponent(h.title.replace(/ /g, '_')), added: Date.now() };
+      put('articles', a); touch(); saveStats();
+      return a;
+    }
+  }
+  throw { code: 'none' };
+}
+async function run(el, fn) {
+  if (el.disabled) return;
+  const label = el.textContent; el.disabled = true; el.textContent = 'Buscando…';
+  try { await fn() } catch (e) { toast(e?.code === 'none' ? 'No he encontrado nada. Prueba con otro tema.' : NET_ERR) }
+  el.disabled = false; el.textContent = label;
+}
+function dailyArticle() {
+  if (!S.ready || S.stats.lastAuto === dayKey() || ui.autoArticle || !navigator.onLine) return;
+  ui.autoArticle = true; refresh();
+  writeArticle('all').then(() => { S.stats = { ...S.stats, lastAuto: dayKey() }; saveStats(); toast('Tienes un artículo nuevo') }).catch(() => { }).finally(() => { ui.autoArticle = false; refresh() });
+}
+
+/* ---------- Gemini, with the viewer's own key (kept only in this browser) ---------- */
+const GEM = 'https://generativelanguage.googleapis.com/v1beta/';
+const gemKey = () => LS.get('gkey', '');
+const hasKey = () => !!gemKey();
+async function gemFetch(path, body) {
+  const r = await fetch(GEM + path, { method: body ? 'POST' : 'GET', headers: { 'x-goog-api-key': gemKey(), ...(body ? { 'content-type': 'application/json' } : {}) }, body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(60000) });
+  if (!r.ok) throw { gem: r.status };
+  return r.json();
+}
+async function gemModel() {
+  const saved = LS.get('gmodel', ''); if (saved) return saved;
+  const j = await gemFetch('models?pageSize=200');
+  const ok = (j.models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent') && /flash/.test(m.name) && !/lite|image|tts|audio|live|thinking|exp/.test(m.name));
+  const ver = m => +(m.name.match(/gemini-(\d+(?:\.\d+)?)/)?.[1] || 0);
+  const best = ok.filter(m => !/preview/.test(m.name)).sort((a, b) => ver(b) - ver(a))[0] || ok.sort((a, b) => ver(b) - ver(a))[0];
+  if (!best) throw { gem: 404 };
+  LS.set('gmodel', best.name); return best.name;
+}
+async function aiJSON(prompt) {
+  const model = await gemModel();
+  let j;
+  try { j = await gemFetch(model + ':generateContent', { contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: { responseMimeType: 'application/json', temperature: 1 } }) }
+  catch (e) { if (e?.gem === 404) LS.set('gmodel', ''); throw e }
+  const text = (j.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('').replace(/^```(?:json)?\s*|\s*```$/g, '');
+  return JSON.parse(text);
+}
+function aiProblem(e) {
+  if (e?.gem === 400 || e?.gem === 401 || e?.gem === 403) toast('Gemini no acepta tu clave. Revísala en Hoy.');
+  else if (e?.gem === 429) toast('Gemini ha llegado a su límite gratuito por ahora. Uso las fuentes abiertas.');
+  else toast('Gemini no responde. Uso las fuentes abiertas.');
+}
+const AI_FACETS = {
+  it: ['algorithms and data structures', 'cybersecurity', 'cloud and DevOps', 'databases', 'web development', 'operating systems', 'machine learning', 'code review and teamwork', 'computer networks', 'mobile apps', 'video games', 'tech start-ups'],
+  sport: ['football', 'rugby', 'cricket', 'tennis', 'athletics', 'Formula 1', 'cycling', 'gym and fitness', 'sports injuries', 'sports journalism', 'basketball', 'boxing'],
+  england: ['pubs', 'trains and buses', 'seeing a GP', 'supermarkets and shopping', 'renting and housemates', 'banter and teasing', 'the weather', 'food and cooking', 'politeness and apologising', 'Yorkshire speech', 'football chat', 'work small talk'],
+  uni: ['lectures and seminars', 'essays and referencing', 'exams and revision', 'student societies', 'group projects', 'freshers week'],
+  general: ['work and careers', 'news and politics', 'the environment', 'money', 'health', 'feelings and relationships'],
+};
+const AI_ENTRY = `{"term": string, "kind": "word"|"expression", "pos": string, "ipa": string (British IPA between slashes), "meaning": string (a clear learner's definition in English), "es": string (natural Spanish equivalent, not a literal translation), "synonyms": string[], "antonyms": string[], "note": string (expressions only: one short sentence in Spanish on when people use it; "" for words), "example": string (a natural British English sentence)}.
+For a word: up to 4 true synonyms and up to 3 true antonyms; leave a list empty rather than force it. For an expression: "synonyms" holds only other established expressions with the same meaning, usually none, and "antonyms" is always [].`;
+const strList = a => Array.isArray(a) ? a.map(String).filter(Boolean).slice(0, 4) : [];
+function aiToEntry(x, kind) {
+  if (!x?.term || !x?.meaning) return null;
+  const k = kind || (x.kind === 'expression' ? 'expression' : 'word');
+  return { term: String(x.term), kind: k, pos: k === 'expression' ? 'expression' : String(x.pos || ''), ipa: String(x.ipa || ''), audio: '', meaning: String(x.meaning), es: String(x.es || ''), synonyms: strList(x.synonyms), antonyms: k === 'word' ? strList(x.antonyms).slice(0, 3) : [], note: String(x.note || ''), example: String(x.example || '') };
+}
+const open_ = { fetchPool, writeArticle, dictEntry };
+fetchPool = async (cat, kind, n) => {
+  if (!hasKey()) return open_.fetchPool(cat, kind, n);
+  try {
+    const c = realCat(cat), facet = pick(AI_FACETS[c]);
+    const avoid = shuffle([...S.words, ...S.pool].map(w => w.term)).slice(0, 150).join(', ');
+    const want = kind === 'expression' ? `${n} expressions, idioms or fixed phrases that people genuinely use in England today (multi-word)` : kind === 'word' ? `${n} C1-level single English words (letters only)` : `${n} items: half C1-level single words, half natural multi-word expressions people use in England`;
+    const r = await aiJSON(`List ${want} related to "${facet}" for a Spanish student who will spend a year in York, UK. Pick varied, useful, less obvious items. Do not use any of these: ${avoid}.\nReply with only a JSON array of objects: ${AI_ENTRY}`);
+    const add = (Array.isArray(r) ? r : []).map(x => aiToEntry(x, kind)).filter(e => e && !knownTerm(e.term)).map(e => ({ ...e, cat: c, id: newId('p') }));
+    if (!add.length) throw { gem: 0 };
+    S.pool = [...S.pool, ...add]; LS.set('pool', S.pool);
+    return add.length;
+  } catch (e) { aiProblem(e); return open_.fetchPool(cat, kind, n) }
+};
+writeArticle = async (topicOrCat, free) => {
+  if (!hasKey()) return open_.writeArticle(topicOrCat, free);
+  try {
+    const topic = free ? topicOrCat : pick(AI_FACETS[realCat(topicOrCat)]);
+    const style = pick(['an opinion column', 'a magazine feature', 'a humorous personal essay', 'a practical guide', 'a thoughtful blog post', 'a news analysis']);
+    const due = shuffle(S.words.filter(w => w.kind === 'word' && (w.box || 0) < MASTERED)).slice(0, 8).map(w => w.term).join(', ');
+    const r = await aiJSON(`Write ${style} in British English at CEFR C1 for a Spanish software engineering student who will spend a year in York, UK. Topic: ${topic}. 280-350 words, 4-6 paragraphs separated by a blank line (\\n\\n), each with at least three sentences, a clear point of view, varied C1 grammar and useful vocabulary. Naturally include some of these words if they fit: ${due || 'none'}. Do not reuse these titles: ${S.articles.map(a => a.title).join('; ')}. Do not state uncertain facts as true. Reply with only a JSON object: {"title": string, "topic": string (1-2 words in Spanish), "body": string}.`);
+    if (!r?.title || !r?.body) throw { gem: 0 };
+    const body = String(r.body).replace(/\n{3,}/g, '\n\n');
+    const a = { id: newId('art'), title: String(r.title), topic: String(r.topic || 'General'), body, minutes: Math.max(1, Math.round(body.split(/\s+/).length / 180)), source: 'gemini', added: Date.now() };
+    put('articles', a); touch(); saveStats();
+    return a;
+  } catch (e) { if (e?.code) throw e; aiProblem(e); return open_.writeArticle(topicOrCat, free) }
+};
+dictEntry = async (raw, sentence) => {
+  if (!hasKey()) return open_.dictEntry(raw);
+  try {
+    const r = await aiJSON(`A Spanish learner of English (C1) tapped the word "${raw}"${sentence ? ` in this sentence: "${sentence}"` : ''}. Give a dictionary entry for its dictionary form, with the meaning used in that sentence. Reply with only one JSON object: ${AI_ENTRY}`);
+    const e = aiToEntry(r, raw.includes(' ') ? 'expression' : null);
+    if (!e) throw { gem: 0 };
+    return e;
+  } catch (e) { aiProblem(e); return open_.dictEntry(raw) }
+};
+function geminiPanel() {
+  return hasKey()
+    ? `<section class="panel"><span class="eyebrow">Gemini</span><p>Conectado con tu clave. Gemini escribe los artículos, trae palabras nuevas y explica las que consultas.</p><div class="row"><button class="btn bad" data-a="gemOff">Quitar clave</button></div></section>`
+    : `<section class="panel"><span class="eyebrow">Gemini</span><p>Con una clave gratuita de Gemini, los artículos, las palabras nuevas y las traducciones salen mucho mejor. Sin clave, la app usa fuentes abiertas.</p>
+      <p class="small muted">Consíguela en <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a> con tu cuenta de Google. Se guarda solo en este navegador.</p>
+      <div class="row"><input class="f grow" id="gkey" type="password" autocomplete="off" placeholder="Pega aquí tu clave" aria-label="Clave de Gemini"><button class="btn main" data-a="gemOn">Conectar</button></div></section>`;
+}
+
+/* ---------- games ---------- */
+const GAMES = [
+  ['sprint', 'Sprint de sinónimos', '60 segundos de sinónimos y antónimos. Fallar resta tiempo.', '<path d="M22 4a18 18 0 1 0 0 36 18 18 0 0 0 0-36Zm0 7v12l8 5" fill="none" stroke="var(--ruby)" stroke-width="3" stroke-linecap="round"/>'],
+  ['match', 'Parejas', 'Une cada palabra con su traducción lo más rápido posible.', '<rect x="4" y="8" width="16" height="28" rx="3" fill="var(--glass)"/><rect x="24" y="8" width="16" height="28" rx="3" fill="var(--amber)"/>'],
+  ['letters', 'Letras', 'Reconstruye la palabra a partir de su definición.', '<rect x="3" y="14" width="11" height="14" rx="2" fill="var(--leaf)"/><rect x="16.5" y="14" width="11" height="14" rx="2" fill="var(--amber)"/><rect x="30" y="14" width="11" height="14" rx="2" fill="var(--ruby)"/>'],
+  ['phrases', 'Expresiones', 'Completa frases hechas y expresiones útiles.', '<path d="M5 8h34v22H19l-8 8v-8H5Z" fill="var(--glass)"/>'],
+];
+const NEED = { sprint: ['word', 14], match: [null, 6], letters: ['word', 8], phrases: ['expression', 10] };
+const FITS = {
+  sprint: w => w.kind === 'word' && (w.synonyms?.length || w.antonyms?.length),
+  match: w => w.es && w.es.length < 42 && w.term.length < 28,
+  letters: w => w.kind === 'word' && /^[a-z]{4,13}$/i.test(w.term),
+  phrases: w => w.kind === 'expression' && w.term.includes(' '),
+};
+VIEWS.games = () => `<div class="stack"><h1>Juegos</h1>
+  <div class="stack" style="gap:8px">
+    <div class="chips">${[['new', 'Palabras nuevas'], ['mine', 'Mi vocabulario']].map(([k, l]) => `<button class="chip" aria-pressed="${ui.src === k}" data-a="src" data-v="${k}">${l}</button>`).join('')}</div>
+    ${ui.src === 'new' ? `<div class="chips">${Object.entries(CATS).map(([k, l]) => `<button class="chip" aria-pressed="${ui.cat === k}" data-a="cat" data-v="${k}">${l}</button>`).join('')}</div>` : ''}
+  </div>
+  <p class="muted small">${ui.src === 'new' ? 'Cada partida trae palabras que no has visto, y se guardan solas en tu vocabulario.' : 'Practicas con lo que ya tienes guardado.'}</p>
+  ${GAMES.map(([k, n, d, ic]) => `<button class="game" data-a="game" data-v="${k}"><svg viewBox="0 0 44 44" aria-hidden="true">${ic}</svg><span><span class="term">${n}</span><br><span class="small muted">${d}</span>${S.stats.best?.[k] != null ? `<br><span class="small">Récord: ${S.stats.best[k]}${k === 'match' ? ' s' : ''}</span>` : ''}</span></button>`).join('')}
+</div>`;
+const quit = `<button class="link" data-a="tab" data-v="games">Salir</button>`;
+function addToVocab(p) {
+  const { cat, played, ...w } = p;
+  if (!S.words.some(x => norm(x.term) === norm(p.term))) S.words = [...S.words, { ...w, id: newId(p.kind === 'expression' ? 'e' : 'w'), topic: CATS[cat] || '', box: 0, due: 0, added: Date.now() }];
+  S.pool = S.pool.filter(x => x.id !== p.id);
+}
+async function startGame(k) {
+  const [kind, n] = NEED[k];
+  if (ui.src === 'mine') { ui.deck = null; return G[k](shuffle(S.words.filter(FITS[k]))) }
+  const inCat = w => ui.cat === 'all' || w.cat === ui.cat, fresh = () => S.pool.filter(w => FITS[k](w) && inCat(w));
+  if (fresh().length < n) {
+    const wait = () => `<div class="card"><div class="big">Buscando palabras nuevas…</div><p class="muted">Tarda unos segundos.</p>${quit}</div>`;
+    open(wait, true);
+    try { await fetchPool(ui.cat, kind, Math.max(n, 12)) } catch { toast(NET_ERR) }
+    if (ui.view !== wait) return;
+  }
+  const deck = shuffle(fresh()).slice(0, n);
+  if (deck.length < 4) return tooFew();
+  deck.forEach(addToVocab); LS.set('words', S.words); LS.set('pool', S.pool);
+  ui.deck = deck; G[k](deck);
+}
+function finish(game, score, lowerWins, detail = '') {
+  const best = S.stats.best?.[game], rec = best == null || (lowerWins ? score < best : score > best);
+  if (rec) S.stats.best = { ...S.stats.best, [game]: score };
+  touch(); saveStats();
+  const deck = ui.deck;
+  const unit = game === 'match' ? ' s' : score === 1 ? ' punto' : ' puntos';
+  open(() => `<div class="stack"><div class="card" style="min-height:0"><span class="eyebrow">${rec ? 'Nuevo récord' : 'Resultado'}</span><div class="big">${score}${unit}</div>${detail}<div class="row" style="justify-content:center"><button class="btn main" data-a="game" data-v="${game}">Otra partida</button><button class="btn" data-a="tab" data-v="games">Juegos</button></div></div>
+    ${deck?.length ? `<section class="stack"><div><h2>Añadidas a tu vocabulario</h2><p class="small muted">Te irán saliendo en el repaso.</p></div><div class="list">${deck.map(w => { const v = S.words.find(x => norm(x.term) === norm(w.term)); return `<button class="item" data-a="word" data-v="${esc(v?.id || '')}"><span><span class="term">${esc(w.term)}</span><br><span class="small muted">${esc(w.es)}</span></span></button>` }).join('')}</div></section>` : ''}</div>`);
+}
+const tooFew = () => open(() => `<div class="stack">${quit}<div class="panel"><h2>No hay palabras suficientes</h2><p>${ui.src === 'mine' ? 'Guarda algunas más o juega con palabras nuevas.' : 'Prueba otro tema o comprueba tu conexión.'}</p></div></div>`);
+const G = {
+  sprint(deck) {
+    const base = deck.filter(FITS.sprint);
+    const pool = [...new Set([...S.words, ...S.pool].filter(w => w.kind === 'word').flatMap(w => [...(w.synonyms || []), ...(w.antonyms || [])]))];
+    if (base.length < 6 || pool.length < 8) return tooFew();
+    let time = 60, score = 0, combo = 0, q = null, locked = false; const missed = [];
+    const next = () => {
+      const w = pick(base), ant = w.antonyms?.length && (!w.synonyms?.length || Math.random() < .35);
+      const right = pick(ant ? w.antonyms : w.synonyms), bad = new Set([...(w.synonyms || []), ...(w.antonyms || []), w.term].map(norm));
+      q = { w, ant, right, opts: shuffle([right, ...shuffle(pool.filter(p => !bad.has(norm(p)))).slice(0, 3)]) };
+    };
+    next();
+    const view = () => `<div class="stack"><div class="row between"><span class="term">${score} puntos${combo > 2 ? ` · racha ${combo}` : ''}</span>${quit}</div>
+      <div class="bar"><i id="tbar" style="width:${time / 60 * 100}%"></i></div>
+      <div class="card" style="min-height:170px"><span class="eyebrow" style="color:var(--${q.ant ? 'ruby' : 'leaf'})">${q.ant ? 'Antónimo de' : 'Sinónimo de'}</span><div class="big">${esc(q.w.term)}</div></div>
+      <div class="choices">${q.opts.map(o => `<button data-a="spr" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div></div>`;
+    A.spr = el => {
+      if (locked) return; locked = true;
+      const ok = el.dataset.v === q.right;
+      if (ok) { combo++; score += 1 + Math.floor(combo / 5) } else { combo = 0; time = Math.max(0, time - 3); missed.push(`${q.w.term}: ${q.right}`) }
+      el.classList.add(ok ? 'ok' : 'no');
+      if (!ok) $$('.choices button').find(b => b.dataset.v === q.right)?.classList.add('ok');
+      setTimeout(() => { locked = false; if (ui.view === view) { next(); render() } }, ok ? 180 : 650);
+    };
+    open(view, true);
+    const iv = setInterval(() => {
+      time--; const b = $('#tbar'); if (b) b.style.width = time / 60 * 100 + '%';
+      if (time <= 0) { clearInterval(iv); ui.stop = null; finish('sprint', score, false, missed.length ? `<p class="small muted">Para repasar: ${[...new Set(missed)].slice(0, 6).map(esc).join(' · ')}</p>` : '') }
+    }, 1000);
+    ui.stop = () => clearInterval(iv);
+  },
+  match(deck) {
+    const base = deck.slice(0, 6);
+    if (base.length < 6) return tooFew();
+    const L = shuffle(base), R = shuffle(base), left = new Set(base.map(w => w.id)); let sel = null, misses = 0; const t0 = Date.now();
+    const view = () => `<div class="stack"><div class="row between"><span class="term">Fallos: <span id="miss">${misses}</span></span>${quit}</div>
+      <div class="pairs"><div>${L.map(w => `<button class="pair" data-a="pair" data-s="l" data-v="${esc(w.id)}">${esc(w.term)}</button>`).join('')}</div>
+      <div>${R.map(w => `<button class="pair" data-a="pair" data-s="r" data-v="${esc(w.id)}">${esc(w.es)}</button>`).join('')}</div></div></div>`;
+    A.pair = el => {
+      if (sel === el) { el.classList.remove('sel'); sel = null; return }
+      if (!sel || sel.dataset.s === el.dataset.s) { sel?.classList.remove('sel'); sel = el; el.classList.add('sel'); return }
+      const a = sel, b = el; sel = null; a.classList.remove('sel');
+      if (a.dataset.v === b.dataset.v) {
+        [a, b].forEach(x => { x.classList.add('ok'); x.disabled = true }); left.delete(a.dataset.v);
+        if (!left.size) setTimeout(() => finish('match', Math.round((Date.now() - t0) / 1000) + misses * 3, true, `<p class="small muted">Incluye 3 s de penalización por fallo (${misses}).</p>`), 350);
+      } else { misses++; $('#miss').textContent = misses;[a, b].forEach(x => { x.classList.add('no'); setTimeout(() => x.classList.remove('no'), 400) }) }
+    };
+    open(view, true);
+  },
+  letters(deck) {
+    const base = deck.slice(0, 8);
+    if (base.length < 4) return tooFew();
+    let i = 0, score = 0, tiles = [], typed = [], hint = false;
+    const load = () => { const w = base[i]; do { tiles = shuffle(w.term.toLowerCase().split('')).map((c, k) => ({ c, k })) } while (tiles.map(t => t.c).join('') === w.term.toLowerCase()); typed = []; hint = false };
+    load();
+    const view = () => {
+      const w = base[i];
+      return `<div class="stack"><div class="row between"><span class="term">${i + 1} de ${base.length} · ${score} puntos</span>${quit}</div>
+      <div class="card" style="min-height:150px"><p>${esc(w.meaning)}</p>${hint ? `<p class="muted">${esc(w.es)}</p>` : ''}</div>
+      <div class="slot" id="slot">${typed.map(t => esc(t.c)).join('') || '&nbsp;'}</div>
+      <div class="tiles">${tiles.map(t => `<button class="tile" data-a="tile" data-v="${t.k}"${typed.includes(t) ? ' disabled' : ''}>${esc(t.c)}</button>`).join('')}</div>
+      <div class="row" style="justify-content:center"><button class="btn" data-a="undo">Borrar</button><button class="btn" data-a="hint"${hint ? ' disabled' : ''}>Pista en español</button><button class="btn" data-a="skip">Saltar</button></div></div>`
+    };
+    const advance = () => { i++; if (i >= base.length) finish('letters', score, false); else { load(); render() } };
+    A.tile = el => {
+      const t = tiles.find(x => x.k === +el.dataset.v); if (typed.includes(t)) return; typed.push(t); render();
+      if (typed.length === tiles.length) {
+        if (typed.map(x => x.c).join('') === base[i].term.toLowerCase()) { score += hint ? 1 : 2; toast('Correcto'); advance() }
+        else { $('#slot').classList.add('shake'); setTimeout(() => { typed = []; render() }, 450) }
+      }
+    };
+    A.undo = () => { typed.pop(); render() };
+    A.hint = () => { hint = true; render() };
+    A.skip = () => { toast(base[i].term); advance() };
+    open(view, true);
+  },
+  phrases(deck) {
+    const STOP = new Set(['the', 'a', 'an', 'to', 'of', 'in', 'on', 'at', 'it', "it's", 'that', 'be', 'you', 'your', 'something', 'with', 'than', 'more', 'can', "i'm", "i'll", 'not', 'could', 'for', 'is', 'my', 'all', 'one']);
+    const keyOf = t => t.split(/\s+/).filter(x => !STOP.has(norm(x))).sort((a, b) => b.length - a.length)[0];
+    const base = deck.filter(w => keyOf(w.term)).slice(0, 10);
+    const keys = [...new Set([...S.words, ...S.pool].filter(w => FITS.phrases(w) && keyOf(w.term)).map(w => keyOf(w.term)))];
+    if (base.length < 5 || keys.length < 6) return tooFew();
+    let i = 0, score = 0, ans = null, opts = [];
+    const load = () => { const k = keyOf(base[i].term); opts = shuffle([k, ...shuffle(keys.filter(x => norm(x) !== norm(k))).slice(0, 3)]); ans = null };
+    load();
+    const view = () => {
+      const w = base[i], k = keyOf(w.term);
+      return `<div class="stack"><div class="row between"><span class="term">${i + 1} de ${base.length} · ${score} puntos</span>${quit}</div>
+      <div class="card" style="min-height:190px"><div class="big" style="font-size:clamp(23px,5.5vw,31px)">${esc(ans ? w.term : w.term.replace(k, '_____'))}</div><p class="muted">${esc(w.meaning)}</p>${ans ? `<p style="font-family:var(--read)"><i>${esc(w.example)}</i></p>` : ''}</div>
+      <div class="choices">${opts.map(o => `<button data-a="phr" data-v="${esc(o)}"${ans ? ' disabled' : ''} class="${ans ? (o === k ? 'ok' : o === ans ? 'no' : '') : ''}">${esc(o)}</button>`).join('')}</div>
+      ${ans ? `<button class="btn main" data-a="phrNext">${i + 1 < base.length ? 'Siguiente' : 'Ver resultado'}</button>` : ''}</div>`
+    };
+    A.phr = el => { ans = el.dataset.v; if (ans === keyOf(base[i].term)) score++; render() };
+    A.phrNext = () => { i++; if (i >= base.length) finish('phrases', score, false); else { load(); render() } };
+    open(view, true);
+  }
+};
+
+/* ---------- actions ---------- */
+function keepWord(id) { const p = S.pool.find(w => w.id === id); if (!p) return; addToVocab(p); LS.set('words', S.words); LS.set('pool', S.pool); touch(); saveStats(); toast('Guardada en tu vocabulario') }
+const A = {
+  tab: el => { closeSheet(); goTab(el.dataset.v); try { location.hash = el.dataset.v } catch { } },
+  close: closeSheet,
+  newWord: () => wordForm(),
+  word: el => showWord(el.dataset.v),
+  edit: el => wordForm(S.words.find(w => w.id === el.dataset.v)),
+  speak: el => speak(el.dataset.v, +el.dataset.r || .95),
+  play: el => playWord(el.dataset.v),
+  gemOn: el => { const k = $('#gkey').value.trim(); if (!k) { toast('Pega primero tu clave.'); return } LS.set('gkey', k); LS.set('gmodel', ''); run(el, async () => { try { await gemModel(); toast('Gemini conectado'); render() } catch (e) { LS.set('gkey', ''); toast(e?.gem ? 'Gemini no acepta esa clave. Revísala.' : NET_ERR) } }) },
+  gemOff: () => { LS.set('gkey', ''); LS.set('gmodel', ''); render(); toast('Clave quitada') },
+  tmpKeep: () => { const w = ui.tmp; put('words', { ...w, id: newId('w'), box: 0, due: 0, added: Date.now() }); touch(); saveStats(); closeSheet(); toast('Guardada en tu vocabulario'); refresh(); markSaved() },
+  tmpForm: () => wordForm(ui.tmp),
+  backup: () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ words: S.words, articles: S.articles, pool: S.pool, stats: S.stats })], { type: 'application/json' })); a.download = `snickelway-${dayKey()}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000) },
+  keep: el => { keepWord(el.dataset.v); closeSheet(); render() },
+  filter: el => { ui.filter = el.dataset.v; render() },
+  src: el => { ui.src = el.dataset.v; LS.set('src', ui.src); render() },
+  cat: el => { ui.cat = el.dataset.v; LS.set('cat', ui.cat); render() },
+  delAsk: el => { el.textContent = '¿Seguro? Toca para borrar'; el.dataset.a = 'del' },
+  del: el => { remove('words', el.dataset.v); closeSheet(); toast('Borrada'); refresh() },
+  delArtAsk: el => { el.textContent = '¿Seguro? Toca para borrar'; el.dataset.a = 'delArt' },
+  delArt: el => { remove('articles', el.dataset.v); goTab('reading'); toast('Artículo borrado') },
+  review: startReview,
+  art: el => showArticle(el.dataset.v),
+  ex: el => showExercise(el.dataset.v, el.dataset.e),
+  game: el => startGame(el.dataset.v),
+  tap: el => {
+    const raw = el.textContent, ctx = el.closest('p, li')?.textContent || '';
+    const sent = sentencesOf(ctx).find(x => x.includes(raw))?.trim() || '';
+    lookup(raw, /\{\d+\}|[0-9]…/.test(sent) ? '' : sent);
+  },
+  fill: el => {
+    const term = $('#f-term').value.trim(); if (!term) { toast('Escribe primero la palabra.'); return }
+    run(el, async () => {
+      const r = term.includes(' ') ? await idiomEntry(term) : await dictEntry(term);
+      if (!r || !$('#f-term')) { toast('No aparece en el diccionario. Puedes rellenarla a mano.'); return }
+      const expr = r.kind === 'expression';
+      $('#f-term').value = r.term; $('#f-kind').value = expr ? 'expression' : 'word'; $('#f-pos').value = r.pos || ''; $('#f-ipa').value = r.ipa || ''; $('#f-meaning').value = r.meaning; $('#f-es').value = r.es || '';
+      $('#f-syn').value = r.synonyms.join(', '); $('#f-ant').value = expr ? '' : r.antonyms.join(', '); if (r.example && !$('#f-ex').value) $('#f-ex').value = r.example;
+      syncKind();
+    });
+  },
+  suggest: () => sheet(`<form id="sf" class="stack"><h2>Traer palabras nuevas</h2>
+    <label class="l">Tema<select class="f" id="s-cat">${Object.entries(CATS).map(([k, l]) => `<option value="${k}"${k === ui.cat ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+    <label class="l">Qué quieres<select class="f" id="s-kind"><option value="">Palabras y expresiones</option><option value="expression">Solo expresiones</option><option value="word">Solo palabras</option></select></label>
+    <div class="row"><button class="btn main" type="submit" id="s-go">Traer 10</button><button class="btn" type="button" data-a="close">Cerrar</button></div></form>`),
+  surprise: el => run(el, async () => { const a = await writeArticle(el.dataset.v); showArticle(a.id) }),
+  newArticle: el => {
+    const topic = $('#topic').value.trim(); if (!topic) { toast('Escribe un tema primero.'); return }
+    run(el, async () => { const a = await writeArticle(topic, true); showArticle(a.id) });
+  },
+};
+
+document.addEventListener('click', e => {
+  if (e.target.id === 'sheet') return closeSheet();
+  const el = e.target.closest('[data-a]'); if (el && A[el.dataset.a]) A[el.dataset.a](el);
+});
+document.addEventListener('input', e => { if (e.target.id === 'search') { ui.q = e.target.value; $('#rows').innerHTML = wordRows() } });
+function markSaved() { $$('.w').forEach(w => { const k = new Set(S.words.filter(x => x.kind === 'word').map(x => norm(x.term))); if (stems(w.textContent).some(s => k.has(s))) w.classList.add('saved') }) }
+document.addEventListener('change', e => {
+  if (e.target.id === 'restore' && e.target.files[0]) {
+    const f = new FileReader(); f.onload = () => {
+      try { const d = JSON.parse(f.result); if (!Array.isArray(d.words) || !Array.isArray(d.articles)) throw 0; ['words', 'articles', 'pool'].forEach(c => { S[c] = d[c] || []; LS.set(c, S[c]) }); S.stats = { days: {}, best: {}, done: {}, ...d.stats }; saveStats(); render(); toast('Copia restaurada') }
+      catch { toast('Ese archivo no es una copia de Snickelway.') }
+    }; f.readAsText(e.target.files[0]);
+  }
+  if (e.target.id === 'f-kind') syncKind();
+  if (e.target.id === 'voice') { LS.set('voice', e.target.value); speak('Hello, nice to meet you.') }
+});
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  if (e.target.id === 'wf') saveWord(e.target);
+  if (e.target.id === 'sf') {
+    const cat = $('#s-cat').value, kind = $('#s-kind').value || null;
+    run($('#s-go'), async () => { const n = await fetchPool(cat, kind, 10); closeSheet(); toast(n + ' nuevas en Descubrir'); ui.filter = 'discover'; render() });
+  }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#sheet').hidden) closeSheet() });
+window.addEventListener('hashchange', () => { const t = location.hash.slice(1); if (VIEWS[t] && (t !== ui.tab || ui.view)) goTab(t) });
+{ const t = location.hash.slice(1); if (VIEWS[t]) ui.tab = t }
+boot();
+</script>
+</body>
+</html>
