@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1D3F9A">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>Snickelway</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -280,6 +284,7 @@ VIEWS.today = () => {
     ${next ? `<section class="panel"><span class="eyebrow">Para leer</span><h3>${esc(next.title)}</h3><p class="small muted">${esc(next.topic)} · ${esc(next.minutes)} min</p><div><button class="btn" data-a="art" data-v="${esc(next.id)}">Leer artículo</button></div></section>` : ''}
     ${newCard('Expresión de hoy', ex)}${newCard('Palabra de hoy', nw)}
   </div>
+  <section class="panel" id="install" hidden><span class="eyebrow">App de escritorio</span><p>Instala Snickelway en este ordenador: tendrá su propio icono y ventana, y funcionará sin conexión.</p><div><button class="btn main" data-a="install">Instalar app</button></div></section>
   ${geminiPanel()}
   <section class="panel"><span class="eyebrow">Copia de seguridad</span><p class="small muted">Tu progreso se guarda en este navegador. Descarga una copia de vez en cuando, y úsala para pasar tus datos a otro dispositivo.</p><div class="row"><button class="btn" data-a="backup">Descargar copia</button><label class="btn" for="restore">Restaurar copia</label><input id="restore" type="file" accept=".json" hidden></div></section>
 </div>`};
@@ -1005,6 +1010,7 @@ const A = {
   edit: el => wordForm(S.words.find(w => w.id === el.dataset.v)),
   speak: el => speak(el.dataset.v, +el.dataset.r || .95),
   play: el => playWord(el.dataset.v),
+  install: async () => { if (!installEvt) return; installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); if (r?.outcome === 'accepted') { installEvt = null; showInstall() } },
   gemOn: el => { const k = $('#gkey').value.trim(); if (!k) { toast('Pega primero tu clave.'); return } LS.set('gkey', k); LS.set('gmodel', ''); run(el, async () => { try { await gemModel(); toast('Gemini conectado'); render() } catch (e) { LS.set('gkey', ''); toast(e?.gem ? 'Gemini no acepta esa clave. Revísala.' : NET_ERR) } }) },
   gemOff: () => { LS.set('gkey', ''); LS.set('gmodel', ''); render(); toast('Clave quitada') },
   tmpKeep: () => { const w = ui.tmp; put('words', { ...w, id: newId('w'), box: 0, due: 0, added: Date.now() }); touch(); saveStats(); closeSheet(); toast('Guardada en tu vocabulario'); refresh(); markSaved() },
@@ -1076,6 +1082,12 @@ document.addEventListener('submit', e => {
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#sheet').hidden) closeSheet() });
 window.addEventListener('hashchange', () => { const t = location.hash.slice(1); if (VIEWS[t] && (t !== ui.tab || ui.view)) goTab(t) });
 { const t = location.hash.slice(1); if (VIEWS[t]) ui.tab = t }
+let installEvt = null;
+const showInstall = () => { const p = $('#install'); if (p) p.hidden = !installEvt };
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; showInstall() });
+window.addEventListener('appinstalled', () => { installEvt = null; showInstall(); toast('Snickelway instalada') });
+const _render = render; render = function () { _render(); showInstall() };
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => { });
 boot();
 </script>
 </body>
