@@ -30,6 +30,10 @@
   --glass: #8FAAFF; --on-glass: #0E1424; --ruby: #FF8BA0; --amber: #F2B94C; --leaf: #63D0A6;
   --tint: #232E50; --ok: #173B30; --bad: #47202C; --unlit: #28314C; color-scheme: dark }
 * { box-sizing: border-box }
+[hidden] { display: none !important }
+html { -webkit-text-size-adjust: 100%; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px) }
+body { margin: 0 }
+img { max-width: 100% }
 body { background: var(--stone); color: var(--ink); font: 400 16px/1.5 var(--ui); }
 #wrap { max-width: 720px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px 104px; }
 h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.2; margin: 0; text-wrap: balance }

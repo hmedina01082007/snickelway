@@ -1,6 +1,6 @@
 // Snickelway offline support: the app itself works without a connection.
 // The page is fetched fresh when online (so updates arrive) and served from cache when offline.
-const CACHE = 'snickelway-v1';
+const CACHE = 'snickelway-v2';
 const SHELL = ['./', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {
